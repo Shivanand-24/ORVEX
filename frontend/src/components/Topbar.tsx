@@ -9,7 +9,7 @@ function Topbar() {
   return (
     <header className="topbar">
       <div className="topbar-search">
-        <Search size={18} />
+        <Search size={18} strokeWidth={2} />
 
         <input
           type="text"
@@ -22,7 +22,7 @@ function Topbar() {
 
       <div className="topbar-actions">
         <div className="security-status">
-          <ShieldCheck size={17} />
+          <ShieldCheck size={17} strokeWidth={2} />
           <span>Secure</span>
         </div>
 
@@ -31,10 +31,14 @@ function Topbar() {
           type="button"
           aria-label="Notifications"
         >
-          <Bell size={19} />
+          <Bell size={19} strokeWidth={2} />
         </button>
 
-        <button className="profile-button" type="button">
+        <button
+          className="profile-button"
+          type="button"
+          aria-label="Open profile menu"
+        >
           <div className="profile-avatar">S</div>
 
           <div className="profile-info">
@@ -42,7 +46,7 @@ function Topbar() {
             <span>Administrator</span>
           </div>
 
-          <ChevronDown size={16} />
+          <ChevronDown size={16} strokeWidth={2} />
         </button>
       </div>
     </header>
