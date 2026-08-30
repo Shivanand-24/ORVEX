@@ -1263,3 +1263,746 @@ a {
     padding: 18px;
   }
 }
+
+/* =========================================================
+   ORVEX WORKFLOW CENTER
+   ========================================================= */
+
+.workflows-page {
+  width: 100%;
+}
+
+/* Workflow Section */
+
+.workflow-section {
+  margin-top: 28px;
+}
+
+/* Workflow List */
+
+.workflow-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* Workflow Item */
+
+.workflow-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px;
+  border: 1px solid var(--orvex-border);
+  border-radius: 12px;
+  background: var(--orvex-surface);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.workflow-item:hover {
+  background: var(--orvex-surface-2);
+  border-color: #303642;
+  transform: translateY(-1px);
+}
+
+/* Workflow Main */
+
+.workflow-main {
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+/* Workflow Icon */
+
+.workflow-icon {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: rgba(139, 92, 246, 0.12);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  color: var(--orvex-accent-hover);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Workflow Information */
+
+.workflow-info {
+  min-width: 0;
+}
+
+.workflow-info h3 {
+  margin: 0;
+  color: var(--orvex-text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.workflow-info p {
+  margin: 5px 0 10px;
+  color: var(--orvex-text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* Workflow Metadata */
+
+.workflow-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  color: var(--orvex-text-muted);
+  font-size: 11px;
+}
+
+/* Workflow Status */
+
+.workflow-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.workflow-status .status-dot {
+  width: 7px;
+  height: 7px;
+  display: inline-block;
+  border-radius: 50%;
+}
+
+/* Active */
+
+.workflow-status.active {
+  color: var(--orvex-success);
+}
+
+.workflow-status.active .status-dot {
+  background: var(--orvex-success);
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.45);
+}
+
+/* Draft */
+
+.workflow-status.draft {
+  color: var(--orvex-warning);
+}
+
+.workflow-status.draft .status-dot {
+  background: var(--orvex-warning);
+}
+
+/* Workflow Action */
+
+.workflow-action {
+  flex-shrink: 0;
+  height: 36px;
+  padding: 0 16px;
+  border: 1px solid var(--orvex-border);
+  border-radius: 8px;
+  background: var(--orvex-surface-2);
+  color: var(--orvex-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.workflow-action:hover {
+  background: rgba(139, 92, 246, 0.12);
+  border-color: rgba(139, 92, 246, 0.4);
+  color: var(--orvex-accent-hover);
+}
+
+/* =========================================================
+   WORKFLOW RESPONSIVE DESIGN
+   ========================================================= */
+
+@media (max-width: 700px) {
+  .workflow-item {
+    align-items: flex-start;
+  }
+
+  .workflow-main {
+    gap: 11px;
+  }
+
+  .workflow-meta {
+    gap: 8px 12px;
+  }
+
+  .workflow-action {
+    padding: 0 12px;
+  }
+}
+
+@media (max-width: 560px) {
+  .workflow-item {
+    flex-direction: column;
+  }
+
+  .workflow-main {
+    width: 100%;
+  }
+
+  .workflow-action {
+    width: 100%;
+  }
+
+  .workflow-info p {
+    font-size: 11px;
+  }
+}
+
+/* =========================================================
+   ORVEX CREATE WORKFLOW
+   ========================================================= */
+
+.create-workflow-page {
+  width: 100%;
+}
+
+.workflow-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.secondary-button {
+  height: 38px;
+  padding: 0 16px;
+  border: 1px solid var(--orvex-border);
+  border-radius: 8px;
+  background: var(--orvex-surface);
+  color: var(--orvex-text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.secondary-button:hover {
+  background: var(--orvex-surface-2);
+  border-color: #303642;
+  color: var(--orvex-text);
+}
+
+/* Workflow Builder Card */
+
+.workflow-builder-card {
+  margin-top: 24px;
+}
+
+/* Form */
+
+.workflow-form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  margin-top: 8px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  color: var(--orvex-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  border: 1px solid var(--orvex-border);
+  border-radius: 9px;
+  outline: none;
+  background: var(--orvex-surface);
+  color: var(--orvex-text);
+  font-size: 13px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.form-group input {
+  height: 44px;
+  padding: 0 13px;
+}
+
+.form-group textarea {
+  padding: 12px 13px;
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.5;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: var(--orvex-text-muted);
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: rgba(139, 92, 246, 0.65);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.08);
+}
+
+/* Workflow Steps */
+
+.workflow-steps {
+  display: flex;
+  flex-direction: column;
+  margin-top: 12px;
+}
+
+.workflow-step {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--orvex-border);
+  border-radius: 10px;
+  background: var(--orvex-surface);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.workflow-step:hover {
+  background: var(--orvex-surface-2);
+  border-color: #303642;
+}
+
+/* Step Number */
+
+.step-number {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  background: rgba(139, 92, 246, 0.12);
+  border: 1px solid rgba(139, 92, 246, 0.22);
+  color: var(--orvex-accent-hover);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* Step Content */
+
+.step-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.step-content strong {
+  color: var(--orvex-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.step-content span {
+  color: var(--orvex-text-muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+/* Step Type */
+
+.step-type {
+  flex-shrink: 0;
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: #171b24;
+  border: 1px solid var(--orvex-border);
+  color: var(--orvex-text-secondary);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+/* Connector */
+
+.workflow-connector {
+  width: 1px;
+  height: 20px;
+  margin-left: 33px;
+  background: #303642;
+}
+
+/* Add Step */
+
+.add-step-button {
+  width: 100%;
+  height: 42px;
+  margin-top: 18px;
+  border: 1px dashed #343a47;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--orvex-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.add-step-button:hover {
+  background: rgba(139, 92, 246, 0.06);
+  border-color: rgba(139, 92, 246, 0.45);
+  color: var(--orvex-accent-hover);
+}
+
+/* =========================================================
+   CREATE WORKFLOW RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 650px) {
+  .workflow-header-actions {
+    width: 100%;
+  }
+
+  .workflow-header-actions button {
+    flex: 1;
+  }
+
+  .workflow-step {
+    align-items: flex-start;
+  }
+
+  .step-type {
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .workflow-header-actions {
+    flex-direction: column-reverse;
+  }
+
+  .workflow-header-actions button {
+    width: 100%;
+  }
+
+  .workflow-step {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .step-content span {
+    font-size: 10px;
+  }
+
+  .step-type {
+    display: none;
+  }
+}
+
+/* =========================================================
+   INTERACTIVE WORKFLOW STEPS
+   ========================================================= */
+
+.workflow-step {
+  position: relative;
+}
+
+.step-icon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(139, 92, 246, 0.08);
+  color: var(--orvex-accent-hover);
+}
+
+.step-delete-button {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--orvex-text-muted);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.step-delete-button:hover {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.2);
+  color: var(--orvex-danger);
+}
+
+/* Add Step Container */
+
+.add-step-container {
+  position: relative;
+  margin-top: 18px;
+}
+
+/* Add Step Button */
+
+.add-step-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+/* Step Menu */
+
+.step-menu {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 0;
+  z-index: 20;
+  width: 210px;
+  padding: 7px;
+  border: 1px solid var(--orvex-border);
+  border-radius: 10px;
+  background: #11141b;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+}
+
+.step-menu button {
+  width: 100%;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--orvex-text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  text-align: left;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.step-menu button:hover {
+  background: var(--orvex-surface-2);
+  color: var(--orvex-text);
+}
+
+.step-menu button svg {
+  color: var(--orvex-accent-hover);
+}
+
+/* =========================================================
+   INTERACTIVE WORKFLOW RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 650px) {
+  .step-icon {
+    display: none;
+  }
+
+  .step-delete-button {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .workflow-step {
+    flex-wrap: wrap;
+  }
+
+  .step-content {
+    flex: 1;
+  }
+
+  .step-delete-button {
+    margin-left: auto;
+  }
+
+  .step-type {
+    margin-left: 46px;
+  }
+
+  .step-menu {
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   WORKFLOW CONFIGURATION
+   ========================================================= */
+
+.workflow-step {
+  cursor: pointer;
+}
+
+.workflow-step-selected {
+  border-color: rgba(139, 92, 246, 0.55);
+  background: rgba(139, 92, 246, 0.06);
+  box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.08);
+}
+
+.step-config-button {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--orvex-text-muted);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.step-config-button:hover {
+  background: rgba(139, 92, 246, 0.1);
+  border-color: rgba(139, 92, 246, 0.25);
+  color: var(--orvex-accent-hover);
+}
+
+/* Configuration Card */
+
+.workflow-config-card {
+  margin-top: 24px;
+  animation: configSlideIn 0.2s ease;
+}
+
+@keyframes configSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Configuration Header */
+
+.config-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.config-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.config-title h2 {
+  margin: 0;
+  color: var(--orvex-text);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.config-title p {
+  margin: 5px 0 0;
+  color: var(--orvex-text-muted);
+  font-size: 12px;
+}
+
+.config-close-button {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--orvex-text-muted);
+}
+
+.config-close-button:hover {
+  background: var(--orvex-surface-2);
+  border-color: var(--orvex-border);
+  color: var(--orvex-text);
+}
+
+/* Configuration Inputs */
+
+.workflow-config-card .workflow-form {
+  margin-top: 24px;
+}
+
+.workflow-config-card select {
+  width: 100%;
+  height: 44px;
+  padding: 0 13px;
+  border: 1px solid var(--orvex-border);
+  border-radius: 9px;
+  outline: none;
+  background: var(--orvex-surface);
+  color: var(--orvex-text);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.workflow-config-card select:focus {
+  border-color: rgba(139, 92, 246, 0.65);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.08);
+}
+
+/* Mobile */
+
+@media (max-width: 650px) {
+  .step-config-button {
+    width: 28px;
+    height: 28px;
+  }
+
+  .config-header {
+    gap: 10px;
+  }
+
+  .config-title {
+    align-items: flex-start;
+  }
+}

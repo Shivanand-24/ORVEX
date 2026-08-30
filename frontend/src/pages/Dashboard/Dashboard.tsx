@@ -1,49 +1,116 @@
+import { useNavigate } from "react-router-dom";
+
+const stats = [
+  {
+    label: "Active Agents",
+    value: "12",
+    change: "+12.5% from last month",
+  },
+  {
+    label: "Workflows",
+    value: "28",
+    change: "+8.2% from last month",
+  },
+  {
+    label: "Knowledge Items",
+    value: "1,284",
+    change: "+18.4% from last month",
+  },
+  {
+    label: "System Uptime",
+    value: "99.9%",
+    change: "All systems operational",
+  },
+];
+
+const systemStatus = [
+  {
+    name: "AI Services",
+    status: "Online",
+  },
+  {
+    name: "Knowledge Engine",
+    status: "Online",
+  },
+  {
+    name: "Workflow Engine",
+    status: "Online",
+  },
+  {
+    name: "Database",
+    status: "Online",
+  },
+];
+
+const recentActivity = [
+  {
+    type: "AI",
+    message: "AI Assistant processed a request",
+    time: "2 minutes ago",
+  },
+  {
+    type: "WF",
+    message: 'Workflow "Data Sync" completed',
+    time: "18 minutes ago",
+  },
+  {
+    type: "AG",
+    message: 'Agent "Research Bot" executed',
+    time: "42 minutes ago",
+  },
+];
+
 function Dashboard() {
+  const navigate = useNavigate();
+
+  const handleCreateWorkflow = () => {
+   navigate("/create-workflow");
+  };
+
   return (
     <div className="dashboard-page">
       <div className="page-header">
         <div>
           <h1>Dashboard</h1>
-          <p>Good morning, Shivanand. Here's what's happening in ORVEX.</p>
+
+          <p>
+            Good morning, Shivanand. Here's what's happening in ORVEX.
+          </p>
         </div>
 
-        <button className="primary-button">
+        <button
+          className="primary-button"
+          type="button"
+          onClick={handleCreateWorkflow}
+        >
           + Create Workflow
         </button>
       </div>
 
+      {/* Statistics */}
+
       <div className="stats-grid">
-        <div className="stat-card">
-          <span>Active Agents</span>
-          <strong>12</strong>
-          <small>+12.5% from last month</small>
-        </div>
+        {stats.map((stat) => (
+          <div className="stat-card" key={stat.label}>
+            <span>{stat.label}</span>
 
-        <div className="stat-card">
-          <span>Workflows</span>
-          <strong>28</strong>
-          <small>+8.2% from last month</small>
-        </div>
+            <strong>{stat.value}</strong>
 
-        <div className="stat-card">
-          <span>Knowledge Items</span>
-          <strong>1,284</strong>
-          <small>+18.4% from last month</small>
-        </div>
-
-        <div className="stat-card">
-          <span>System Uptime</span>
-          <strong>99.9%</strong>
-          <small>All systems operational</small>
-        </div>
+            <small>{stat.change}</small>
+          </div>
+        ))}
       </div>
+
+      {/* Intelligence Overview + System Status */}
 
       <div className="dashboard-grid">
         {/* Intelligence Overview */}
+
         <section className="dashboard-card large-card">
           <div className="card-header">
             <div>
               <h2>Intelligence Overview</h2>
+
               <p>ORVEX activity across your workspace</p>
             </div>
           </div>
@@ -84,6 +151,7 @@ function Dashboard() {
                       stopColor="#8b5cf6"
                       stopOpacity="0.3"
                     />
+
                     <stop
                       offset="100%"
                       stopColor="#8b5cf6"
@@ -144,78 +212,58 @@ function Dashboard() {
         </section>
 
         {/* System Status */}
+
         <section className="dashboard-card">
           <div className="card-header">
             <div>
               <h2>System Status</h2>
+
               <p>Current platform health</p>
             </div>
           </div>
 
           <div className="status-list">
-            <div>
-              <span className="status-dot online"></span>
-              <span>AI Services</span>
-              <strong>Online</strong>
-            </div>
+            {systemStatus.map((service) => (
+              <div key={service.name}>
+                <span className="status-dot online"></span>
 
-            <div>
-              <span className="status-dot online"></span>
-              <span>Knowledge Engine</span>
-              <strong>Online</strong>
-            </div>
+                <span>{service.name}</span>
 
-            <div>
-              <span className="status-dot online"></span>
-              <span>Workflow Engine</span>
-              <strong>Online</strong>
-            </div>
-
-            <div>
-              <span className="status-dot online"></span>
-              <span>Database</span>
-              <strong>Online</strong>
-            </div>
+                <strong>{service.status}</strong>
+              </div>
+            ))}
           </div>
         </section>
       </div>
 
       {/* Recent Activity */}
+
       <section className="dashboard-card activity-card">
         <div className="card-header">
           <div>
             <h2>Recent Activity</h2>
+
             <p>Latest events in your workspace</p>
           </div>
         </div>
 
         <div className="activity-list">
-          <div className="activity-item">
-            <div className="activity-icon">AI</div>
+          {recentActivity.map((activity) => (
+            <div
+              className="activity-item"
+              key={activity.message}
+            >
+              <div className="activity-icon">
+                {activity.type}
+              </div>
 
-            <div>
-              <strong>AI Assistant processed a request</strong>
-              <span>2 minutes ago</span>
+              <div>
+                <strong>{activity.message}</strong>
+
+                <span>{activity.time}</span>
+              </div>
             </div>
-          </div>
-
-          <div className="activity-item">
-            <div className="activity-icon">WF</div>
-
-            <div>
-              <strong>Workflow "Data Sync" completed</strong>
-              <span>18 minutes ago</span>
-            </div>
-          </div>
-
-          <div className="activity-item">
-            <div className="activity-icon">AG</div>
-
-            <div>
-              <strong>Agent "Research Bot" executed</strong>
-              <span>42 minutes ago</span>
-            </div>
-          </div>
+          ))}
         </div>
       </section>
     </div>

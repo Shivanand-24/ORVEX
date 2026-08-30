@@ -8,6 +8,7 @@ import Agents from "../pages/Agents/Agents";
 import Analytics from "../pages/Analytics/Analytics";
 import Knowledge from "../pages/Knowledge/Knowledge";
 import Workflows from "../pages/Workflows/Workflows";
+import CreateWorkflow from "../pages/Workflows/CreateWorkflow";
 
 const router = createBrowserRouter([
   {
@@ -38,6 +39,10 @@ const router = createBrowserRouter([
         path: "workflows",
         element: <Workflows />,
       },
+      {
+  path: "create-workflow",
+  element: <CreateWorkflow />,
+},
     ],
   },
 ]);
