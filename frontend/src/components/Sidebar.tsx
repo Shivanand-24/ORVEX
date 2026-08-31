@@ -7,31 +7,38 @@ import {
   Settings,
   Workflow,
 } from "lucide-react";
+import { NavLink } from "react-router-dom";
 
 const navigation = [
   {
     label: "Overview",
     icon: LayoutDashboard,
+    path: "/",
   },
   {
     label: "AI Assistant",
     icon: Bot,
+    path: "/assistant",
   },
   {
     label: "Knowledge",
     icon: Database,
+    path: "/knowledge",
   },
   {
     label: "Agents",
     icon: Network,
+    path: "/agents",
   },
   {
     label: "Workflows",
     icon: Workflow,
+    path: "/workflows",
   },
   {
     label: "Analytics",
     icon: BarChart3,
+    path: "/analytics",
   },
 ];
 
@@ -52,24 +59,24 @@ function Sidebar() {
           const Icon = item.icon;
 
           return (
-            <button
-              className="navigation-item"
+            <NavLink
               key={item.label}
-              type="button"
+              to={item.path}
+              end={item.path === "/"}
+              className={({ isActive }) =>
+                `navigation-item ${isActive ? "active" : ""}`
+              }
             >
-              <Icon size={19} strokeWidth={1.8} />
+              <Icon size={18} />
               <span>{item.label}</span>
-            </button>
+            </NavLink>
           );
         })}
       </nav>
 
       <div className="sidebar-footer">
-        <button
-          className="navigation-item settings-item"
-          type="button"
-        >
-          <Settings size={19} strokeWidth={1.8} />
+        <button className="navigation-item" type="button">
+          <Settings size={18} />
           <span>Settings</span>
         </button>
 
