@@ -30,11 +30,14 @@ function Knowledge() {
   const selectedDocument = documents.find(
     (document) => document.id === selectedDocumentId,
   );
-  const processedDocuments = documents.filter(
-    (document) => document.status === "Processed",
-  );
   const processingDocuments = documents.filter(
     (document) => document.status === "Processing",
+  );
+  const indexedDocuments = documents.filter(
+    (document) => document.readiness === "Indexed",
+  );
+  const indexingDocuments = documents.filter(
+    (document) => document.readiness === "Indexing",
   );
 
   const getSourceName = (document: KnowledgeDocument) =>
@@ -60,6 +63,26 @@ function Knowledge() {
     knowledgeRepository.failProcessing(selectedDocument.id);
   };
 
+  const handleIndexingDemoAction = (
+    action: "start" | "complete" | "fail",
+  ) => {
+    if (!selectedDocument) {
+      return;
+    }
+
+    if (action === "start") {
+      knowledgeRepository.startIndexing(selectedDocument.id);
+      return;
+    }
+
+    if (action === "complete") {
+      knowledgeRepository.completeIndexing(selectedDocument.id);
+      return;
+    }
+
+    knowledgeRepository.failIndexing(selectedDocument.id);
+  };
+
   return (
     <div className="knowledge-page">
       <div className="page-header">
@@ -81,14 +104,14 @@ function Knowledge() {
           <small>Connected collections</small>
         </div>
         <div className="stat-card">
-          <span>Processed</span>
-          <strong>{processedDocuments.length}</strong>
-          <small>Available to AI workflows</small>
+          <span>RAG Ready</span>
+          <strong>{indexedDocuments.length}</strong>
+          <small>Mock-indexed for retrieval</small>
         </div>
         <div className="stat-card knowledge-processing-stat">
-          <span>Processing</span>
-          <strong>{processingDocuments.length}</strong>
-          <small>Preparing for retrieval</small>
+          <span>Pipeline Active</span>
+          <strong>{processingDocuments.length + indexingDocuments.length}</strong>
+          <small>Processing or mock indexing</small>
         </div>
       </div>
 
@@ -264,6 +287,44 @@ function Knowledge() {
                   </div>
                 )}
               </div>
+              {selectedDocument.status === "Processed" && (
+  <div className="knowledge-demo-controls">
+    <p>Indexing demo — in-memory only</p>
+
+    {selectedDocument.readiness === "NotIndexed" ||
+    selectedDocument.readiness === "IndexFailed" ? (
+      <button
+        className="secondary-button"
+        type="button"
+        onClick={() => handleIndexingDemoAction("start")}
+      >
+        {selectedDocument.readiness === "IndexFailed"
+          ? "Retry demo indexing"
+          : "Start demo indexing"}
+      </button>
+    ) : selectedDocument.readiness === "Indexing" ? (
+      <div className="knowledge-demo-actions">
+        <button
+          className="primary-button"
+          type="button"
+          onClick={() => handleIndexingDemoAction("complete")}
+        >
+          Complete demo indexing
+        </button>
+
+        <button
+          className="secondary-button knowledge-failure-button"
+          type="button"
+          onClick={() => handleIndexingDemoAction("fail")}
+        >
+          Simulate indexing failure
+        </button>
+      </div>
+    ) : (
+      <p>✓ Indexed — ready for future retrieval</p>
+    )}
+  </div>
+)}
             </>
           ) : (
             <div className="knowledge-detail-empty">

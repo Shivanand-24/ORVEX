@@ -4,6 +4,12 @@ export type DocumentStatus =
   | "Processed"
   | "Failed";
 
+export type KnowledgeReadiness =
+  | "NotIndexed"
+  | "Indexing"
+  | "Indexed"
+  | "IndexFailed";
+
 export type KnowledgeSource = {
   id: string;
   name: string;
@@ -17,6 +23,7 @@ export type KnowledgeDocument = {
   sourceId: string;
   sizeBytes: number;
   status: DocumentStatus;
+  readiness: KnowledgeReadiness;
   updatedAt: string;
   summary: string;
 };
