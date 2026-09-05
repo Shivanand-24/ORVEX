@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import "./styles/navigation.css";
 
 /* =========================================================
    ORVEX DESIGN SYSTEM
@@ -264,17 +265,6 @@ a {
 
 .navigation-item:active {
   transform: scale(0.98);
-}
-
-/* Active navigation */
-
-.sidebar-navigation .navigation-item:first-child {
-  background: rgba(139, 92, 246, 0.12);
-  color: #a78bfa;
-}
-
-.sidebar-navigation .navigation-item:first-child:hover {
-  background: rgba(139, 92, 246, 0.17);
 }
 
 /* =========================================================
@@ -629,6 +619,50 @@ a {
   padding: 34px 66px 50px;
 
   overflow-x: hidden;
+}
+
+/* =========================================================
+   ROUTING FALLBACKS
+   ========================================================= */
+
+.route-error {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--orvex-bg);
+}
+
+.route-message {
+  width: min(100%, 520px);
+  padding: 32px;
+  border: 1px solid var(--orvex-border);
+  border-radius: 13px;
+  background: var(--orvex-surface);
+}
+
+.route-message-eyebrow {
+  margin: 0 0 8px;
+  color: var(--orvex-accent-hover);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.route-message h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.route-message > p:not(.route-message-eyebrow) {
+  margin: 10px 0 0;
+  color: var(--orvex-text-secondary);
+}
+
+.route-message-action {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 24px;
 }
 
 /* =========================================================

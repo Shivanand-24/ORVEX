@@ -1,0 +1,22 @@
+/* Route-aware navigation and deliberately unavailable controls. */
+
+.sidebar-navigation .navigation-item.active {
+  background: rgba(139, 92, 246, 0.12);
+  color: #a78bfa;
+}
+
+.sidebar-navigation .navigation-item.active:hover {
+  background: rgba(139, 92, 246, 0.17);
+}
+
+button:disabled,
+input:disabled,
+select:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+button:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}

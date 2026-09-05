@@ -75,7 +75,12 @@ function Sidebar() {
       </nav>
 
       <div className="sidebar-footer">
-        <button className="navigation-item" type="button">
+        <button
+          className="navigation-item"
+          type="button"
+          disabled
+          title="Settings are not available yet"
+        >
           <Settings size={18} />
           <span>Settings</span>
         </button>

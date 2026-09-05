@@ -9,11 +9,14 @@ import Analytics from "../pages/Analytics/Analytics";
 import Knowledge from "../pages/Knowledge/Knowledge";
 import Workflows from "../pages/Workflows/Workflows";
 import CreateWorkflow from "../pages/Workflows/CreateWorkflow";
+import NotFound from "../pages/NotFound/NotFound";
+import RouteError from "../pages/RouteError/RouteError";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <AppLayout />,
+    errorElement: <RouteError />,
     children: [
       {
         index: true,
@@ -40,9 +43,13 @@ const router = createBrowserRouter([
         element: <Workflows />,
       },
       {
-  path: "create-workflow",
-  element: <CreateWorkflow />,
-},
+        path: "create-workflow",
+        element: <CreateWorkflow />,
+      },
+      {
+        path: "*",
+        element: <NotFound />,
+      },
     ],
   },
 ]);

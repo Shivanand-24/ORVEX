@@ -16,6 +16,14 @@
 - Maintained GitHub development workflow and project version control.
 
 ### Today's Focus
-- Continue building the ORVEX Agents module.
-- Improve enterprise-level UI and functionality.
-- Maintain consistent daily development progress.
+- Complete the frontend foundation refactor before adding new modules.
+
+## September 5, 2026
+
+### ORVEX Progress
+- Removed unused Vite starter artifacts.
+- Added route-aware sidebar active states plus not-found and route-error handling.
+- Added shared workflow types and in-memory agent/workflow repositories.
+- Aligned dashboard and Agents metrics with one mock agent source.
+- Marked unavailable controls as disabled instead of presenting fake functionality.
+- Added accurate frontend setup and verification instructions to the root README.

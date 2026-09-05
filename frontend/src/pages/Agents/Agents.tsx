@@ -5,39 +5,16 @@ import {
   Activity,
   Clock,
 } from "lucide-react";
-
-const agents = [
-  {
-    name: "Research Agent",
-    description: "Researches and summarizes enterprise knowledge.",
-    status: "Active",
-    executions: 248,
-    lastRun: "2 minutes ago",
-  },
-  {
-    name: "Data Analyst",
-    description: "Analyzes enterprise datasets and generates insights.",
-    status: "Active",
-    executions: 184,
-    lastRun: "12 minutes ago",
-  },
-  {
-    name: "HR Intelligence",
-    description: "Analyzes employee information and HR-related data.",
-    status: "Active",
-    executions: 96,
-    lastRun: "28 minutes ago",
-  },
-  {
-    name: "Operations Agent",
-    description: "Automates operational tasks and business processes.",
-    status: "Paused",
-    executions: 142,
-    lastRun: "1 hour ago",
-  },
-];
+import { agentRepository } from "../../services/agentRepository";
 
 function Agents() {
+  const agents = agentRepository.list();
+  const activeAgents = agents.filter((agent) => agent.status === "Active");
+  const totalExecutions = agents.reduce(
+    (total, agent) => total + agent.executions,
+    0,
+  );
+
   return (
     <div className="agents-page">
       <div className="page-header">
@@ -48,7 +25,12 @@ function Agents() {
           </p>
         </div>
 
-        <button className="primary-button" type="button">
+        <button
+          className="primary-button"
+          type="button"
+          disabled
+          title="Agent creation is not available yet"
+        >
           + Create Agent
         </button>
       </div>
@@ -61,7 +43,7 @@ function Agents() {
 
           <div>
             <span>Total Agents</span>
-            <strong>12</strong>
+            <strong>{agents.length}</strong>
           </div>
         </div>
 
@@ -72,7 +54,7 @@ function Agents() {
 
           <div>
             <span>Active Agents</span>
-            <strong>9</strong>
+            <strong>{activeAgents.length}</strong>
           </div>
         </div>
 
@@ -83,7 +65,7 @@ function Agents() {
 
           <div>
             <span>Total Executions</span>
-            <strong>1,284</strong>
+            <strong>{totalExecutions.toLocaleString()}</strong>
           </div>
         </div>
 
@@ -94,7 +76,7 @@ function Agents() {
 
           <div>
             <span>Success Rate</span>
-            <strong>98.7%</strong>
+            <strong>—</strong>
           </div>
         </div>
       </div>
@@ -105,7 +87,12 @@ function Agents() {
           <p>Manage and monitor your AI workforce.</p>
         </div>
 
-        <select className="agent-filter" defaultValue="all">
+        <select
+          className="agent-filter"
+          defaultValue="all"
+          disabled
+          title="Filtering is not available yet"
+        >
           <option value="all">All Agents</option>
           <option value="active">Active</option>
           <option value="paused">Paused</option>
@@ -141,6 +128,8 @@ function Agents() {
                 className="agent-menu-button"
                 type="button"
                 aria-label={`More options for ${agent.name}`}
+                disabled
+                title="Agent options are not available yet"
               >
                 <MoreVertical size={18} />
               </button>
@@ -162,7 +151,12 @@ function Agents() {
               </div>
             </div>
 
-            <button className="agent-view-button" type="button">
+            <button
+              className="agent-view-button"
+              type="button"
+              disabled
+              title="Agent details are not available yet"
+            >
               View Agent
               <span>→</span>
             </button>

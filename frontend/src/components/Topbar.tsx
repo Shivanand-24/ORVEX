@@ -15,6 +15,7 @@ function Topbar() {
           type="text"
           placeholder="Search ORVEX..."
           aria-label="Search ORVEX"
+          disabled
         />
 
         <span className="search-shortcut">⌘ K</span>
@@ -30,6 +31,8 @@ function Topbar() {
           className="icon-button"
           type="button"
           aria-label="Notifications"
+          disabled
+          title="Notifications are not available yet"
         >
           <Bell size={19} strokeWidth={2} />
         </button>
@@ -38,6 +41,8 @@ function Topbar() {
           className="profile-button"
           type="button"
           aria-label="Open profile menu"
+          disabled
+          title="Profile controls are not available yet"
         >
           <div className="profile-avatar">S</div>
 

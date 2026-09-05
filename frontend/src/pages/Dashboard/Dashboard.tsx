@@ -1,10 +1,12 @@
 import { useNavigate } from "react-router-dom";
+import { agentRepository } from "../../services/agentRepository";
 
+const agents = agentRepository.list();
 const stats = [
   {
     label: "Active Agents",
-    value: "12",
-    change: "+12.5% from last month",
+    value: agents.filter((agent) => agent.status === "Active").length.toString(),
+    change: "From the current agent roster",
   },
   {
     label: "Workflows",

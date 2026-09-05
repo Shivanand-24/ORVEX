@@ -10,25 +10,14 @@ import {
   X,
   Zap,
 } from "lucide-react";
-
-type StepType = "Trigger" | "AI Agent" | "Action" | "Condition";
-
-type WorkflowStep = {
-  id: number;
-  type: StepType;
-  title: string;
-  description: string;
-  config: {
-    agent?: string;
-    task?: string;
-    trigger?: string;
-    action?: string;
-    condition?: string;
-  };
-};
+import type {
+  WorkflowStep,
+  WorkflowStepConfig,
+  WorkflowStepType,
+} from "../../types/workflow";
 
 const stepTemplates: Record<
-  StepType,
+  WorkflowStepType,
   {
     title: string;
     description: string;
@@ -112,17 +101,7 @@ function CreateWorkflow() {
     navigate("/workflows");
   };
 
-  const handleSaveWorkflow = () => {
-    console.log("ORVEX Workflow:", {
-      name: workflowName,
-      description,
-      steps,
-    });
-
-    navigate("/workflows");
-  };
-
-  const handleAddStep = (type: StepType) => {
+  const handleAddStep = (type: WorkflowStepType) => {
     const template = stepTemplates[type];
 
     const newStep: WorkflowStep = {
@@ -152,7 +131,7 @@ function CreateWorkflow() {
   };
 
   const updateStepConfig = (
-    key: keyof WorkflowStep["config"],
+    key: keyof WorkflowStepConfig,
     value: string,
   ) => {
     if (selectedStepId === null) {
@@ -174,7 +153,7 @@ function CreateWorkflow() {
     );
   };
 
-  const getStepIcon = (type: StepType) => {
+  const getStepIcon = (type: WorkflowStepType) => {
     switch (type) {
       case "Trigger":
         return <Zap size={17} />;
@@ -227,7 +206,8 @@ function CreateWorkflow() {
           <button
             className="primary-button"
             type="button"
-            onClick={handleSaveWorkflow}
+            disabled
+            title="Saving workflows is not available until persistence is implemented"
           >
             Save Workflow
           </button>

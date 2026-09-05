@@ -1,30 +1,9 @@
 import { useNavigate } from "react-router-dom";
-const workflows = [
-  {
-    name: "Employee Data Sync",
-    description: "Synchronize employee information across enterprise systems.",
-    status: "Active",
-    executions: 128,
-    lastRun: "5 minutes ago",
-  },
-  {
-    name: "Research Intelligence",
-    description: "Analyze documents and generate structured research insights.",
-    status: "Active",
-    executions: 84,
-    lastRun: "24 minutes ago",
-  },
-  {
-    name: "Monthly Performance Report",
-    description: "Generate automated employee performance reports.",
-    status: "Draft",
-    executions: 0,
-    lastRun: "Not executed",
-  },
-];
+import { workflowRepository } from "../../services/workflowRepository";
 
 function Workflows() {
   const navigate = useNavigate();
+  const workflows = workflowRepository.list();
 
   const handleCreateWorkflow = () => {
     navigate("/create-workflow");
@@ -134,11 +113,8 @@ function Workflows() {
               <button
                 className="workflow-action"
                 type="button"
-                onClick={() =>
-                  console.log(
-                    `Opening workflow: ${workflow.name}`,
-                  )
-                }
+                disabled
+                title="Opening saved workflows is not available yet"
               >
                 Open
               </button>
