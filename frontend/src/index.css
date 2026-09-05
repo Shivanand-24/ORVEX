@@ -2523,13 +2523,21 @@ a {
   background: currentColor;
 }
 
-.knowledge-status.ready {
+.knowledge-status.processed {
   color: var(--orvex-success);
 }
 
 .knowledge-status.processing,
 .knowledge-processing-stat small {
   color: var(--orvex-warning);
+}
+
+.knowledge-status.pending {
+  color: var(--orvex-accent-hover);
+}
+
+.knowledge-status.failed {
+  color: var(--orvex-danger);
 }
 
 .knowledge-empty-state {
@@ -2598,6 +2606,38 @@ a {
   color: var(--orvex-text-secondary);
   font-weight: 600;
   text-align: right;
+}
+
+.knowledge-detail-list dd .knowledge-status {
+  justify-content: flex-end;
+}
+
+.knowledge-demo-controls {
+  margin-top: 20px;
+}
+
+.knowledge-demo-controls > p {
+  margin: 0 0 10px;
+  color: var(--orvex-text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.knowledge-demo-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.knowledge-demo-controls .primary-button,
+.knowledge-demo-controls .secondary-button {
+  width: 100%;
+}
+
+.knowledge-failure-button {
+  color: var(--orvex-danger);
 }
 
 .knowledge-detail-empty {

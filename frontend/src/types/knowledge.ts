@@ -1,4 +1,8 @@
-export type DocumentStatus = "Ready" | "Processing";
+export type DocumentStatus =
+  | "Pending"
+  | "Processing"
+  | "Processed"
+  | "Failed";
 
 export type KnowledgeSource = {
   id: string;

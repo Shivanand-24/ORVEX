@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Database, FileText, Search } from "lucide-react";
 import { knowledgeRepository } from "../../services/knowledgeRepository";
 import type { KnowledgeDocument } from "../../types/knowledge";
 
-const documents = knowledgeRepository.listDocuments();
 const sources = knowledgeRepository.listSources();
 
 function formatFileSize(sizeBytes: number) {
@@ -11,10 +10,15 @@ function formatFileSize(sizeBytes: number) {
 }
 
 function Knowledge() {
+  const [documents, setDocuments] = useState(() => knowledgeRepository.listDocuments());
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(
     documents[0]?.id ?? null,
   );
+
+  useEffect(() => knowledgeRepository.subscribe(() => {
+    setDocuments(knowledgeRepository.listDocuments());
+  }), []);
 
   const normalizedQuery = searchQuery.trim().toLowerCase();
   const filteredDocuments = documents.filter((document) => {
@@ -26,8 +30,8 @@ function Knowledge() {
   const selectedDocument = documents.find(
     (document) => document.id === selectedDocumentId,
   );
-  const readyDocuments = documents.filter(
-    (document) => document.status === "Ready",
+  const processedDocuments = documents.filter(
+    (document) => document.status === "Processed",
   );
   const processingDocuments = documents.filter(
     (document) => document.status === "Processing",
@@ -35,6 +39,26 @@ function Knowledge() {
 
   const getSourceName = (document: KnowledgeDocument) =>
     sources.find((source) => source.id === document.sourceId)?.name ?? "Unknown source";
+
+  const handleDemoAction = (
+    action: "start" | "complete" | "fail",
+  ) => {
+    if (!selectedDocument) {
+      return;
+    }
+
+    if (action === "start") {
+      knowledgeRepository.startProcessing(selectedDocument.id);
+      return;
+    }
+
+    if (action === "complete") {
+      knowledgeRepository.completeProcessing(selectedDocument.id);
+      return;
+    }
+
+    knowledgeRepository.failProcessing(selectedDocument.id);
+  };
 
   return (
     <div className="knowledge-page">
@@ -57,8 +81,8 @@ function Knowledge() {
           <small>Connected collections</small>
         </div>
         <div className="stat-card">
-          <span>Ready to Search</span>
-          <strong>{readyDocuments.length}</strong>
+          <span>Processed</span>
+          <strong>{processedDocuments.length}</strong>
           <small>Available to AI workflows</small>
         </div>
         <div className="stat-card knowledge-processing-stat">
@@ -198,13 +222,48 @@ function Knowledge() {
                 </div>
                 <div>
                   <dt>Status</dt>
-                  <dd>{selectedDocument.status}</dd>
+                  <dd>
+                    <span className={`knowledge-status ${selectedDocument.status.toLowerCase()}`}>
+                      <span></span>
+                      {selectedDocument.status}
+                    </span>
+                  </dd>
                 </div>
                 <div>
                   <dt>Updated</dt>
                   <dd>{selectedDocument.updatedAt}</dd>
                 </div>
               </dl>
+
+              <div className="knowledge-demo-controls">
+                <p>Demo controls — in-memory only</p>
+                {selectedDocument.status !== "Processing" ? (
+                  <button
+                    className="secondary-button"
+                    type="button"
+                    onClick={() => handleDemoAction("start")}
+                  >
+                    {selectedDocument.status === "Failed" ? "Retry demo processing" : "Start demo processing"}
+                  </button>
+                ) : (
+                  <div className="knowledge-demo-actions">
+                    <button
+                      className="primary-button"
+                      type="button"
+                      onClick={() => handleDemoAction("complete")}
+                    >
+                      Complete demo processing
+                    </button>
+                    <button
+                      className="secondary-button knowledge-failure-button"
+                      type="button"
+                      onClick={() => handleDemoAction("fail")}
+                    >
+                      Simulate failure
+                    </button>
+                  </div>
+                )}
+              </div>
             </>
           ) : (
             <div className="knowledge-detail-empty">
