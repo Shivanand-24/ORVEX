@@ -15,6 +15,8 @@ import type {
   WorkflowStepConfig,
   WorkflowStepType,
 } from "../../types/workflow";
+import { workflowRepository } from "../../services/workflowRepository";
+import { toastService } from "../../services/toastService";
 
 const stepTemplates: Record<
   WorkflowStepType,
@@ -27,23 +29,25 @@ const stepTemplates: Record<
     title: "Trigger",
     description: "Define what starts this workflow.",
   },
-
   "AI Agent": {
     title: "AI Agent",
-    description:
-      "Let an ORVEX AI agent process and analyze information.",
+    description: "Let an ORVEX AI agent process and analyze information.",
   },
-
+  "Knowledge Retrieval": {
+    title: "Knowledge Retrieval",
+    description: "Query indexed enterprise knowledge documents.",
+  },
   Action: {
     title: "Action",
-    description:
-      "Define what should happen after the AI completes its task.",
+    description: "Define what should happen after the AI completes its task.",
   },
-
   Condition: {
     title: "Condition",
-    description:
-      "Evaluate information and decide which workflow path to follow.",
+    description: "Evaluate information and decide which workflow path to follow.",
+  },
+  "Human Approval": {
+    title: "Human Approval",
+    description: "Pause execution for admin sign-off.",
   },
 };
 
@@ -63,25 +67,21 @@ function CreateWorkflow() {
         trigger: "Manual",
       },
     },
-
     {
       id: 2,
       type: "AI Agent",
       title: "AI Agent",
-      description:
-        "Let an ORVEX AI agent process and analyze information.",
+      description: "Let an ORVEX AI agent process and analyze information.",
       config: {
         agent: "Research Agent",
         task: "",
       },
     },
-
     {
       id: 3,
       type: "Action",
       title: "Action",
-      description:
-        "Define what should happen after the AI completes its task.",
+      description: "Define what should happen after the AI completes its task.",
       config: {
         action: "Send Notification",
       },
@@ -89,15 +89,33 @@ function CreateWorkflow() {
   ]);
 
   const [showStepMenu, setShowStepMenu] = useState(false);
+  const [selectedStepId, setSelectedStepId] = useState<number | null>(null);
 
-  const [selectedStepId, setSelectedStepId] =
-    useState<number | null>(null);
-
-  const selectedStep = steps.find(
-    (step) => step.id === selectedStepId,
-  );
+  const selectedStep = steps.find((step) => step.id === selectedStepId);
 
   const handleCancel = () => {
+    navigate("/workflows");
+  };
+
+  const handleSaveWorkflow = () => {
+    const title = workflowName.trim() || "Custom Automation Workflow";
+    const wfDescription = description.trim() || "Automated enterprise workflow.";
+    const firstTrigger = steps.find((s) => s.type === "Trigger")?.config.trigger || "Manual Trigger";
+
+    workflowRepository.create({
+      name: title,
+      description: wfDescription,
+      status: "Active",
+      trigger: firstTrigger,
+      steps,
+    });
+
+    toastService.show(
+      "Workflow Saved",
+      `Workflow "${title}" was created with ${steps.length} steps.`,
+      "success"
+    );
+
     navigate("/workflows");
   };
 
@@ -112,28 +130,18 @@ function CreateWorkflow() {
       config: {},
     };
 
-    setSteps((currentSteps) => [
-      ...currentSteps,
-      newStep,
-    ]);
-
+    setSteps((currentSteps) => [...currentSteps, newStep]);
     setShowStepMenu(false);
   };
 
   const handleRemoveStep = (id: number) => {
-    setSteps((currentSteps) =>
-      currentSteps.filter((step) => step.id !== id),
-    );
-
+    setSteps((currentSteps) => currentSteps.filter((step) => step.id !== id));
     if (selectedStepId === id) {
       setSelectedStepId(null);
     }
   };
 
-  const updateStepConfig = (
-    key: keyof WorkflowStepConfig,
-    value: string,
-  ) => {
+  const updateStepConfig = (key: keyof WorkflowStepConfig, value: string) => {
     if (selectedStepId === null) {
       return;
     }
@@ -148,8 +156,8 @@ function CreateWorkflow() {
                 [key]: value,
               },
             }
-          : step,
-      ),
+          : step
+      )
     );
   };
 
@@ -157,16 +165,12 @@ function CreateWorkflow() {
     switch (type) {
       case "Trigger":
         return <Zap size={17} />;
-
       case "AI Agent":
         return <Bot size={17} />;
-
       case "Action":
         return <Play size={17} />;
-
       case "Condition":
         return <GitBranch size={17} />;
-
       default:
         return <Zap size={17} />;
     }
@@ -176,22 +180,16 @@ function CreateWorkflow() {
     if (!selectedStep) {
       return "Configure Step";
     }
-
     return `Configure ${selectedStep.type}`;
   };
 
   return (
     <div className="create-workflow-page">
       {/* Page Header */}
-
       <div className="page-header">
         <div>
           <h1>Create Workflow</h1>
-
-          <p>
-            Build an intelligent workflow to automate enterprise
-            operations.
-          </p>
+          <p>Build an intelligent workflow to automate enterprise operations.</p>
         </div>
 
         <div className="workflow-header-actions">
@@ -206,8 +204,7 @@ function CreateWorkflow() {
           <button
             className="primary-button"
             type="button"
-            disabled
-            title="Saving workflows is not available until persistence is implemented"
+            onClick={handleSaveWorkflow}
           >
             Save Workflow
           </button>
@@ -215,47 +212,33 @@ function CreateWorkflow() {
       </div>
 
       {/* Workflow Details */}
-
       <section className="dashboard-card workflow-builder-card">
         <div className="card-header">
           <div>
             <h2>Workflow Details</h2>
-
-            <p>
-              Define the basic information for your workflow.
-            </p>
+            <p>Define the basic information for your workflow.</p>
           </div>
         </div>
 
         <div className="workflow-form">
           <div className="form-group">
-            <label htmlFor="workflow-name">
-              Workflow Name
-            </label>
-
+            <label htmlFor="workflow-name">Workflow Name</label>
             <input
               id="workflow-name"
               type="text"
               value={workflowName}
-              onChange={(event) =>
-                setWorkflowName(event.target.value)
-              }
+              onChange={(event) => setWorkflowName(event.target.value)}
               placeholder="e.g. Employee Performance Analysis"
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="workflow-description">
-              Description
-            </label>
-
+            <label htmlFor="workflow-description">Description</label>
             <textarea
               id="workflow-description"
               rows={4}
               value={description}
-              onChange={(event) =>
-                setDescription(event.target.value)
-              }
+              onChange={(event) => setDescription(event.target.value)}
               placeholder="Describe what this workflow should accomplish..."
             />
           </div>
@@ -263,15 +246,11 @@ function CreateWorkflow() {
       </section>
 
       {/* Workflow Steps */}
-
       <section className="dashboard-card workflow-builder-card">
         <div className="card-header">
           <div>
             <h2>Workflow Steps</h2>
-
-            <p>
-              Define how ORVEX should execute this workflow.
-            </p>
+            <p>Define how ORVEX should execute this workflow.</p>
           </div>
         </div>
 
@@ -280,31 +259,19 @@ function CreateWorkflow() {
             <div key={step.id}>
               <div
                 className={`workflow-step ${
-                  selectedStepId === step.id
-                    ? "workflow-step-selected"
-                    : ""
+                  selectedStepId === step.id ? "workflow-step-selected" : ""
                 }`}
-                onClick={() =>
-                  setSelectedStepId(step.id)
-                }
+                onClick={() => setSelectedStepId(step.id)}
               >
-                <div className="step-number">
-                  {index + 1}
-                </div>
-
-                <div className="step-icon">
-                  {getStepIcon(step.type)}
-                </div>
+                <div className="step-number">{index + 1}</div>
+                <div className="step-icon">{getStepIcon(step.type)}</div>
 
                 <div className="step-content">
                   <strong>{step.title}</strong>
-
                   <span>{step.description}</span>
                 </div>
 
-                <span className="step-type">
-                  {step.type}
-                </span>
+                <span className="step-type">{step.type}</span>
 
                 <button
                   className="step-config-button"
@@ -331,46 +298,31 @@ function CreateWorkflow() {
                 </button>
               </div>
 
-              {index < steps.length - 1 && (
-                <div className="workflow-connector"></div>
-              )}
+              {index < steps.length - 1 && <div className="workflow-connector"></div>}
             </div>
           ))}
         </div>
 
-        {/* Add Step */}
-
+        {/* Add Step Container */}
         <div className="add-step-container">
           {showStepMenu && (
             <div className="step-menu">
-              <button
-                type="button"
-                onClick={() => handleAddStep("Trigger")}
-              >
+              <button type="button" onClick={() => handleAddStep("Trigger")}>
                 <Zap size={16} />
                 <span>Trigger</span>
               </button>
 
-              <button
-                type="button"
-                onClick={() => handleAddStep("AI Agent")}
-              >
+              <button type="button" onClick={() => handleAddStep("AI Agent")}>
                 <Bot size={16} />
                 <span>AI Agent</span>
               </button>
 
-              <button
-                type="button"
-                onClick={() => handleAddStep("Action")}
-              >
+              <button type="button" onClick={() => handleAddStep("Action")}>
                 <Play size={16} />
                 <span>Action</span>
               </button>
 
-              <button
-                type="button"
-                onClick={() => handleAddStep("Condition")}
-              >
+              <button type="button" onClick={() => handleAddStep("Condition")}>
                 <GitBranch size={16} />
                 <span>Condition</span>
               </button>
@@ -380,34 +332,24 @@ function CreateWorkflow() {
           <button
             className="add-step-button"
             type="button"
-            onClick={() =>
-              setShowStepMenu((visible) => !visible)
-            }
+            onClick={() => setShowStepMenu((visible) => !visible)}
           >
             <Plus size={16} />
-
             {showStepMenu ? "Close" : "Add Step"}
           </button>
         </div>
       </section>
 
       {/* Configuration Panel */}
-
       {selectedStep && (
         <section className="dashboard-card workflow-config-card">
           <div className="config-header">
             <div>
               <div className="config-title">
-                <div className="step-icon">
-                  {getStepIcon(selectedStep.type)}
-                </div>
-
+                <div className="step-icon">{getStepIcon(selectedStep.type)}</div>
                 <div>
                   <h2>{getConfigurationTitle()}</h2>
-
-                  <p>
-                    Configure how this step behaves.
-                  </p>
+                  <p>Configure how this step behaves.</p>
                 </div>
               </div>
             </div>
@@ -415,187 +357,90 @@ function CreateWorkflow() {
             <button
               className="config-close-button"
               type="button"
-              onClick={() =>
-                setSelectedStepId(null)
-              }
+              onClick={() => setSelectedStepId(null)}
               aria-label="Close configuration"
             >
               <X size={18} />
             </button>
           </div>
 
-          {/* Trigger Configuration */}
-
           {selectedStep.type === "Trigger" && (
             <div className="workflow-form">
               <div className="form-group">
-                <label htmlFor="trigger-type">
-                  Trigger Type
-                </label>
-
+                <label htmlFor="trigger-type">Trigger Type</label>
                 <select
                   id="trigger-type"
-                  value={
-                    selectedStep.config.trigger || "Manual"
-                  }
-                  onChange={(event) =>
-                    updateStepConfig(
-                      "trigger",
-                      event.target.value,
-                    )
-                  }
+                  value={selectedStep.config.trigger || "Manual"}
+                  onChange={(event) => updateStepConfig("trigger", event.target.value)}
                 >
-                  <option value="Manual">
-                    Manual Trigger
-                  </option>
-
-                  <option value="Schedule">
-                    Scheduled Trigger
-                  </option>
-
-                  <option value="Webhook">
-                    Webhook
-                  </option>
-
-                  <option value="Event">
-                    Enterprise Event
-                  </option>
+                  <option value="Manual">Manual Trigger</option>
+                  <option value="Schedule">Scheduled Trigger</option>
+                  <option value="Webhook">Webhook</option>
+                  <option value="Event">Enterprise Event</option>
                 </select>
               </div>
             </div>
           )}
 
-          {/* AI Agent Configuration */}
-
           {selectedStep.type === "AI Agent" && (
             <div className="workflow-form">
               <div className="form-group">
-                <label htmlFor="agent-select">
-                  AI Agent
-                </label>
-
+                <label htmlFor="agent-select">AI Agent</label>
                 <select
                   id="agent-select"
-                  value={
-                    selectedStep.config.agent ||
-                    "Research Agent"
-                  }
-                  onChange={(event) =>
-                    updateStepConfig(
-                      "agent",
-                      event.target.value,
-                    )
-                  }
+                  value={selectedStep.config.agent || "Research Agent"}
+                  onChange={(event) => updateStepConfig("agent", event.target.value)}
                 >
-                  <option value="Research Agent">
-                    Research Agent
-                  </option>
-
-                  <option value="Data Analyst">
-                    Data Analyst
-                  </option>
-
-                  <option value="HR Intelligence Agent">
-                    HR Intelligence Agent
-                  </option>
-
-                  <option value="Operations Agent">
-                    Operations Agent
-                  </option>
+                  <option value="Research Agent">Research Agent</option>
+                  <option value="Data Analyst">Data Analyst</option>
+                  <option value="HR Intelligence Agent">HR Intelligence Agent</option>
+                  <option value="Operations Agent">Operations Agent</option>
+                  <option value="Security Review Agent">Security Review Agent</option>
                 </select>
               </div>
 
               <div className="form-group">
-                <label htmlFor="agent-task">
-                  Agent Task
-                </label>
-
+                <label htmlFor="agent-task">Agent Task Prompt</label>
                 <textarea
                   id="agent-task"
-                  rows={5}
-                  value={
-                    selectedStep.config.task || ""
-                  }
-                  onChange={(event) =>
-                    updateStepConfig(
-                      "task",
-                      event.target.value,
-                    )
-                  }
+                  rows={4}
+                  value={selectedStep.config.task || ""}
+                  onChange={(event) => updateStepConfig("task", event.target.value)}
                   placeholder="Describe what the AI agent should analyze or accomplish..."
                 />
               </div>
             </div>
           )}
 
-          {/* Condition Configuration */}
-
           {selectedStep.type === "Condition" && (
             <div className="workflow-form">
               <div className="form-group">
-                <label htmlFor="condition">
-                  Condition
-                </label>
-
+                <label htmlFor="condition">Condition Expression</label>
                 <textarea
                   id="condition"
-                  rows={4}
-                  value={
-                    selectedStep.config.condition || ""
-                  }
-                  onChange={(event) =>
-                    updateStepConfig(
-                      "condition",
-                      event.target.value,
-                    )
-                  }
+                  rows={3}
+                  value={selectedStep.config.condition || ""}
+                  onChange={(event) => updateStepConfig("condition", event.target.value)}
                   placeholder="Example: Employee performance score is below 60"
                 />
               </div>
             </div>
           )}
 
-          {/* Action Configuration */}
-
           {selectedStep.type === "Action" && (
             <div className="workflow-form">
               <div className="form-group">
-                <label htmlFor="action-select">
-                  Action
-                </label>
-
+                <label htmlFor="action-select">Action Type</label>
                 <select
                   id="action-select"
-                  value={
-                    selectedStep.config.action ||
-                    "Send Notification"
-                  }
-                  onChange={(event) =>
-                    updateStepConfig(
-                      "action",
-                      event.target.value,
-                    )
-                  }
+                  value={selectedStep.config.action || "Send Notification"}
+                  onChange={(event) => updateStepConfig("action", event.target.value)}
                 >
-                  <option value="Send Notification">
-                    Send Notification
-                  </option>
-
-                  <option value="Send Email">
-                    Send Email
-                  </option>
-
-                  <option value="Update Database">
-                    Update Database
-                  </option>
-
-                  <option value="Generate Report">
-                    Generate Report
-                  </option>
-
-                  <option value="Call API">
-                    Call External API
-                  </option>
+                  <option value="Send Notification">Send Notification</option>
+                  <option value="Send Email">Send Email</option>
+                  <option value="Update Database">Update Database</option>
+                  <option value="Generate Report">Generate Report</option>
+                  <option value="Call API">Call External API</option>
                 </select>
               </div>
             </div>

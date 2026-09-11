@@ -75,15 +75,15 @@ function Sidebar() {
       </nav>
 
       <div className="sidebar-footer">
-        <button
-          className="navigation-item"
-          type="button"
-          disabled
-          title="Settings are not available yet"
+        <NavLink
+          to="/settings"
+          className={({ isActive }) =>
+            `navigation-item ${isActive ? "active" : ""}`
+          }
         >
           <Settings size={18} />
           <span>Settings</span>
-        </button>
+        </NavLink>
 
         <div className="workspace">
           <div className="workspace-avatar">S</div>

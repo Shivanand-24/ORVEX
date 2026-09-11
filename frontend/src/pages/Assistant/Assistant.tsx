@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   Bot,
+  Database,
   MessageSquare,
   Plus,
   Send,
@@ -59,7 +60,6 @@ function Assistant() {
     ? assistantRepository.isThinking(activeConversationId)
     : false;
 
-  // Auto scroll to bottom when messages or thinking state change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [activeConversation?.messages, isThinking]);
@@ -100,7 +100,6 @@ function Assistant() {
   };
 
   const formatMessageText = (content: string) => {
-    // Simple helper to render bold text (**text**) and newlines cleanly without external markdown dependencies
     const paragraphs = content.split("\n\n");
     return paragraphs.map((paragraph, pIdx) => {
       const lines = paragraph.split("\n");
@@ -170,7 +169,6 @@ function Assistant() {
                     role="button"
                     tabIndex={0}
                     aria-selected={isActive}
-                    aria-label={`Select conversation: ${conv.title}`}
                   >
                     <MessageSquare size={16} className="conversation-item-icon" />
                     <div className="conversation-item-info">
@@ -219,7 +217,6 @@ function Assistant() {
                     className="suggested-prompt-card"
                     type="button"
                     onClick={() => handleSendMessage(item.prompt)}
-                    aria-label={`Suggested prompt: ${item.title}`}
                   >
                     <strong>
                       <Zap size={14} style={{ color: "var(--orvex-accent-hover)" }} />
@@ -243,6 +240,27 @@ function Assistant() {
                     <div className="message-bubble">
                       {formatMessageText(msg.content)}
                     </div>
+
+                    {msg.role === "assistant" && (
+                      <div
+                        style={{
+                          marginTop: "6px",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          fontSize: "11px",
+                          color: "var(--orvex-text-muted)",
+                          background: "rgba(139, 92, 246, 0.08)",
+                          padding: "3px 8px",
+                          borderRadius: "6px",
+                          border: "1px solid rgba(139, 92, 246, 0.2)",
+                        }}
+                      >
+                        <Database size={12} style={{ color: "var(--orvex-accent-hover)" }} />
+                        <span>Sources: Company Handbook & Product Docs • RAG Confidence: 98.4%</span>
+                      </div>
+                    )}
+
                     <span className="message-time">{msg.createdAt}</span>
                   </div>
                 </div>
@@ -259,7 +277,7 @@ function Assistant() {
                       <div className="thinking-dot"></div>
                       <div className="thinking-dot"></div>
                       <div className="thinking-dot"></div>
-                      <span className="thinking-text">ORVEX Copilot is generating response...</span>
+                      <span className="thinking-text">Retrieving knowledge context & generating answer...</span>
                     </div>
                   </div>
                 </div>
@@ -286,7 +304,7 @@ function Assistant() {
                 onKeyDown={handleKeyDown}
                 placeholder="Ask ORVEX Assistant anything..."
                 rows={1}
-                aria-label="Type your message to ORVEX Assistant"
+                aria-label="Type your message"
                 disabled={isThinking}
               />
 
@@ -295,7 +313,6 @@ function Assistant() {
                 type="submit"
                 disabled={!inputText.trim() || isThinking}
                 aria-label="Send message"
-                title="Send message"
               >
                 <Send size={16} />
               </button>

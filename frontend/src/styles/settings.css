@@ -1,0 +1,198 @@
+/* =========================================================
+   SETTINGS PAGE STYLES
+   ========================================================= */
+
+.settings-page {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.settings-layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.settings-tabs {
+  width: 240px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  border-radius: 12px;
+  background: var(--orvex-surface);
+  border: 1px solid var(--orvex-border);
+}
+
+.settings-tab-button {
+  width: 100%;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--orvex-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.settings-tab-button:hover {
+  background: var(--orvex-surface-2);
+  color: var(--orvex-text);
+}
+
+.settings-tab-button.active {
+  background: rgba(139, 92, 246, 0.14);
+  color: var(--orvex-text);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.settings-tab-button.active svg {
+  color: var(--orvex-accent-hover);
+}
+
+.settings-content-card {
+  flex: 1;
+  min-width: 0;
+  padding: 28px;
+  border-radius: 14px;
+  background: var(--orvex-surface);
+  border: 1px solid var(--orvex-border);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.settings-section h2, .settings-form h2 {
+  margin: 0 0 4px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--orvex-text);
+}
+
+.settings-section p, .settings-form p {
+  margin: 0 0 24px 0;
+  font-size: 13px;
+  color: var(--orvex-text-secondary);
+}
+
+.form-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--orvex-text);
+}
+
+.form-group input[type="text"],
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--orvex-border);
+  background: #0d1017;
+  color: var(--orvex-text);
+  font-size: 13px;
+  outline: none;
+}
+
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+  border-color: var(--orvex-accent);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
+}
+
+.settings-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.info-card {
+  padding: 18px;
+  border-radius: 10px;
+  background: #0d1017;
+  border: 1px solid var(--orvex-border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.info-card span {
+  font-size: 12px;
+  color: var(--orvex-text-secondary);
+}
+
+.info-card strong {
+  font-size: 16px;
+  color: var(--orvex-text);
+}
+
+.info-card small {
+  font-size: 11px;
+  color: var(--orvex-text-muted);
+}
+
+.toggle-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-radius: 10px;
+  background: #0d1017;
+  border: 1px solid var(--orvex-border);
+  margin-bottom: 14px;
+}
+
+.toggle-group strong {
+  font-size: 13px;
+  color: var(--orvex-text);
+  display: block;
+}
+
+.toggle-group p {
+  margin: 2px 0 0 0 !important;
+  font-size: 12px !important;
+  color: var(--orvex-text-secondary);
+}
+
+.api-key-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #0d1017;
+  border: 1px solid var(--orvex-border);
+}
+
+.api-key-box code {
+  flex: 1;
+  font-family: monospace;
+  font-size: 13px;
+  color: var(--orvex-accent-hover);
+}
+
+@media (max-width: 800px) {
+  .settings-layout {
+    flex-direction: column;
+  }
+  .settings-tabs {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+  }
+  .settings-info-grid {
+    grid-template-columns: 1fr;
+  }
+}

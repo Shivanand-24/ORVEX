@@ -9,6 +9,7 @@ import Analytics from "../pages/Analytics/Analytics";
 import Knowledge from "../pages/Knowledge/Knowledge";
 import Workflows from "../pages/Workflows/Workflows";
 import CreateWorkflow from "../pages/Workflows/CreateWorkflow";
+import Settings from "../pages/Settings/Settings";
 import NotFound from "../pages/NotFound/NotFound";
 import RouteError from "../pages/RouteError/RouteError";
 
@@ -45,6 +46,10 @@ const router = createBrowserRouter([
       {
         path: "create-workflow",
         element: <CreateWorkflow />,
+      },
+      {
+        path: "settings",
+        element: <Settings />,
       },
       {
         path: "*",
