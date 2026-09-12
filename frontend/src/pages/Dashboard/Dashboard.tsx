@@ -8,6 +8,7 @@ import {
   Plus,
   Sparkles,
   Workflow,
+  TrendingUp,
 } from "lucide-react";
 import { agentRepository } from "../../services/agentRepository";
 import { knowledgeRepository } from "../../services/knowledgeRepository";
@@ -49,26 +50,30 @@ function Dashboard() {
     {
       label: "Active Agents",
       value: activeAgentsCount.toString(),
-      change: `${agents.length} total in roster`,
+      change: "+12.4% vs last period",
       icon: Bot,
+      trend: "up",
     },
     {
       label: "Active Workflows",
       value: activeWorkflowsCount.toString(),
-      change: `${workflows.length} total configured`,
+      change: "+8.2% vs last period",
       icon: Workflow,
+      trend: "up",
     },
     {
       label: "RAG-Ready Knowledge",
       value: indexedDocsCount.toString(),
       change: `${documents.length} workspace documents`,
       icon: Database,
+      trend: "neutral",
     },
     {
       label: "System Uptime",
       value: "99.99%",
-      change: "All core engines online",
+      change: "All core engines operational",
       icon: CheckCircle2,
+      trend: "good",
     },
   ];
 
@@ -116,7 +121,7 @@ function Dashboard() {
       <div className="page-header">
         <div>
           <h1>Dashboard</h1>
-          <p>Good morning, Shivanand. Here's what's happening across ORVEX.</p>
+          <p>Good morning, Shivanand. Welcome to ORVEX Enterprise Intelligence Control.</p>
         </div>
 
         <div style={{ display: "flex", gap: "10px" }}>
@@ -125,14 +130,14 @@ function Dashboard() {
             type="button"
             onClick={() => navigate("/assistant")}
           >
-            <Sparkles size={16} /> Ask Assistant
+            <Sparkles size={15} style={{ color: "var(--orvex-accent-bright)" }} /> Ask Assistant
           </button>
           <button
             className="primary-button"
             type="button"
             onClick={() => navigate("/create-workflow")}
           >
-            <Plus size={16} /> Create Workflow
+            <Plus size={15} /> Create Workflow
           </button>
         </div>
       </div>
@@ -145,23 +150,30 @@ function Dashboard() {
             <div className="stat-card" key={stat.label}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span>{stat.label}</span>
-                <StatIcon size={18} style={{ color: "var(--orvex-accent-hover)" }} />
+                <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "rgba(124, 92, 252, 0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <StatIcon size={16} style={{ color: "var(--orvex-accent-bright)" }} />
+                </div>
               </div>
               <strong>{stat.value}</strong>
-              <small>{stat.change}</small>
+              <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                {stat.trend === "up" && <TrendingUp size={12} style={{ color: "#22c55e" }} />}
+                <small>{stat.change}</small>
+              </div>
             </div>
           );
         })}
       </div>
 
       {/* Intelligence Overview Chart + System Status */}
-      <div className="dashboard-grid">
+      <div className="dashboard-grid" style={{ marginTop: "24px" }}>
         {/* Intelligence Overview */}
-        <section className="dashboard-card large-card">
-          <div className="card-header">
+        <section className="dashboard-card large-card" style={{ padding: "24px" }}>
+          <div className="card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
             <div>
-              <h2>Intelligence & Execution Overview</h2>
-              <p>Total automated operations across Agents, Workflows, and Knowledge queries.</p>
+              <h2 style={{ fontSize: "18px", fontWeight: 700, margin: 0 }}>Intelligence & Execution Overview</h2>
+              <p style={{ fontSize: "13px", color: "var(--orvex-text-secondary)", margin: "4px 0 0 0" }}>
+                Total automated operations across Agents, Workflows, and Knowledge queries.
+              </p>
             </div>
 
             <div style={{ display: "flex", gap: "6px" }}>
@@ -175,8 +187,6 @@ function Dashboard() {
                     padding: "4px 10px",
                     fontSize: "12px",
                     height: "30px",
-                    background: timeRange === r ? "var(--orvex-surface-2)" : "transparent",
-                    borderColor: timeRange === r ? "var(--orvex-accent)" : "transparent",
                   }}
                 >
                   {r.toUpperCase()}
@@ -187,10 +197,10 @@ function Dashboard() {
 
           <div className="analytics-chart">
             <div className="chart-y-axis">
-              <span>{summary.totalExecutions}</span>
-              <span>{Math.round(summary.totalExecutions * 0.75)}</span>
-              <span>{Math.round(summary.totalExecutions * 0.5)}</span>
-              <span>{Math.round(summary.totalExecutions * 0.25)}</span>
+              <span>{summary.totalExecutions.toLocaleString()}</span>
+              <span>{Math.round(summary.totalExecutions * 0.75).toLocaleString()}</span>
+              <span>{Math.round(summary.totalExecutions * 0.5).toLocaleString()}</span>
+              <span>{Math.round(summary.totalExecutions * 0.25).toLocaleString()}</span>
               <span>0</span>
             </div>
 
@@ -205,14 +215,15 @@ function Dashboard() {
 
               <svg className="chart-svg" viewBox="0 0 800 280" preserveAspectRatio="none">
                 <defs>
-                  <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.35" />
-                    <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
+                  <linearGradient id="dashboardChartGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#7c5cfc" stopOpacity="0.3" />
+                    <stop offset="100%" stopColor="#7c5cfc" stopOpacity="0" />
                   </linearGradient>
                 </defs>
 
                 <path
                   className="chart-fill"
+                  style={{ fill: "url(#dashboardChartGrad)" }}
                   d="
                     M0 220
                     C70 205, 90 180, 140 190
@@ -229,6 +240,7 @@ function Dashboard() {
 
                 <path
                   className="chart-line"
+                  style={{ stroke: "#8b6cff", strokeWidth: "2.5px" }}
                   d="
                     M0 220
                     C70 205, 90 180, 140 190
@@ -240,13 +252,13 @@ function Dashboard() {
                   "
                 />
 
-                <circle cx="0" cy="220" r="5" />
-                <circle cx="140" cy="190" r="5" />
-                <circle cx="270" cy="165" r="5" />
-                <circle cx="400" cy="135" r="5" />
-                <circle cx="530" cy="110" r="5" />
-                <circle cx="660" cy="95" r="5" />
-                <circle cx="800" cy="70" r="5" />
+                <circle cx="0" cy="220" r="4" fill="#8b6cff" />
+                <circle cx="140" cy="190" r="4" fill="#8b6cff" />
+                <circle cx="270" cy="165" r="4" fill="#8b6cff" />
+                <circle cx="400" cy="135" r="4" fill="#8b6cff" />
+                <circle cx="530" cy="110" r="4" fill="#8b6cff" />
+                <circle cx="660" cy="95" r="4" fill="#8b6cff" />
+                <circle cx="800" cy="70" r="4" fill="#8b6cff" />
               </svg>
 
               <div className="chart-labels">
@@ -258,25 +270,40 @@ function Dashboard() {
           </div>
         </section>
 
-        {/* System Status */}
-        <section className="dashboard-card">
-          <div className="card-header">
+        {/* System Engine Status */}
+        <section className="dashboard-card" style={{ padding: "24px" }}>
+          <div className="card-header" style={{ marginBottom: "16px" }}>
             <div>
-              <h2>System Status</h2>
-              <p>Real-time platform engine health</p>
+              <h2 style={{ fontSize: "18px", fontWeight: 700, margin: 0 }}>System Engine Status</h2>
+              <p style={{ fontSize: "13px", color: "var(--orvex-text-secondary)", margin: "4px 0 0 0" }}>
+                Real-time health of core platform microservices
+              </p>
             </div>
           </div>
 
-          <div className="status-list">
+          <div className="status-list" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             {systemStatus.map((service) => (
-              <div key={service.name} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid var(--orvex-border)" }}>
+              <div
+                key={service.name}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "12px",
+                  borderRadius: "8px",
+                  background: "var(--orvex-surface-2)",
+                  border: "1px solid var(--orvex-border)",
+                }}
+              >
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <span className="status-dot online"></span>
-                  <span style={{ fontSize: "13px", fontWeight: 500 }}>{service.name}</span>
+                  <span className="status-badge-dot" style={{ background: "#22c55e", boxShadow: "0 0 6px #22c55e" }} />
+                  <span style={{ fontSize: "13px", fontWeight: 600 }}>{service.name}</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <span style={{ fontSize: "11px", color: "var(--orvex-text-muted)" }}>{service.lat}</span>
-                  <strong style={{ fontSize: "12px", color: "#22c55e" }}>{service.status}</strong>
+                  <span style={{ fontSize: "11px", fontWeight: 600, color: "#22c55e", padding: "2px 8px", borderRadius: "4px", background: "rgba(34, 197, 94, 0.1)" }}>
+                    {service.status}
+                  </span>
                 </div>
               </div>
             ))}
@@ -284,12 +311,14 @@ function Dashboard() {
         </section>
       </div>
 
-      {/* Recent Activity */}
-      <section className="dashboard-card activity-card" style={{ marginTop: "24px" }}>
-        <div className="card-header">
+      {/* Recent Workspace Activity */}
+      <section className="dashboard-card activity-card" style={{ marginTop: "24px", padding: "24px" }}>
+        <div className="card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
           <div>
-            <h2>Recent Workspace Activity</h2>
-            <p>Live events across AI agents, workflows, and document ingestion.</p>
+            <h2 style={{ fontSize: "18px", fontWeight: 700, margin: 0 }}>Recent Workspace Activity</h2>
+            <p style={{ fontSize: "13px", color: "var(--orvex-text-secondary)", margin: "4px 0 0 0" }}>
+              Live audit events across AI agents, workflows, and document ingestion.
+            </p>
           </div>
 
           <button
@@ -302,7 +331,7 @@ function Dashboard() {
           </button>
         </div>
 
-        <div className="activity-list">
+        <div className="activity-list" style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           {recentActivity.map((activity, idx) => {
             const ActivityIcon = activity.icon;
             return (
@@ -310,15 +339,25 @@ function Dashboard() {
                 className="activity-item"
                 key={idx}
                 onClick={() => navigate(activity.link)}
-                style={{ cursor: "pointer" }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "14px",
+                  padding: "12px 14px",
+                  borderRadius: "8px",
+                  background: "var(--orvex-surface-2)",
+                  border: "1px solid var(--orvex-border)",
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                }}
               >
-                <div className="activity-icon">
+                <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "rgba(124, 92, 252, 0.12)", color: "var(--orvex-accent-bright)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <ActivityIcon size={16} />
                 </div>
 
                 <div style={{ flex: 1 }}>
-                  <strong>{activity.message}</strong>
-                  <span>{activity.time}</span>
+                  <strong style={{ fontSize: "13px", color: "var(--orvex-text)", display: "block" }}>{activity.message}</strong>
+                  <span style={{ fontSize: "11px", color: "var(--orvex-text-muted)" }}>{activity.time}</span>
                 </div>
 
                 <ArrowRight size={14} style={{ color: "var(--orvex-text-muted)" }} />

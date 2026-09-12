@@ -21,14 +21,15 @@ function Topbar() {
 
   return (
     <header className="topbar">
+      {/* Global Command Search Bar */}
       <div
         className="topbar-search"
         onClick={() => setIsSearchOpen(true)}
         role="button"
         tabIndex={0}
-        aria-label="Open search dialog"
+        aria-label="Open command palette search dialog"
       >
-        <Search size={18} strokeWidth={2} />
+        <Search size={16} className="topbar-search-icon" />
 
         <input
           type="text"
@@ -40,9 +41,14 @@ function Topbar() {
         <span className="search-shortcut">⌘ K</span>
       </div>
 
+      {/* Topbar Right Actions */}
       <div className="topbar-actions" style={{ position: "relative" }}>
-        <div className="security-status">
-          <ShieldCheck size={17} strokeWidth={2} />
+        {/* Security Indicator Pill */}
+        <div
+          className="security-status"
+          title="Workspace security status: Encrypted & compliant"
+        >
+          <ShieldCheck size={15} strokeWidth={2} />
           <span>Secure Workspace</span>
         </div>
 
@@ -58,20 +64,8 @@ function Topbar() {
           title="Toggle Notifications"
           style={{ position: "relative" }}
         >
-          <Bell size={19} strokeWidth={2} />
-          {unreadCount > 0 && (
-            <span
-              style={{
-                position: "absolute",
-                top: "4px",
-                right: "4px",
-                width: "8px",
-                height: "8px",
-                borderRadius: "50%",
-                background: "var(--orvex-accent)",
-              }}
-            />
-          )}
+          <Bell size={18} strokeWidth={2} />
+          {unreadCount > 0 && <span className="notification-dot-badge" />}
         </button>
 
         {/* Profile Button */}
@@ -91,7 +85,7 @@ function Topbar() {
             <span>Administrator</span>
           </div>
 
-          <ChevronDown size={16} strokeWidth={2} />
+          <ChevronDown size={14} strokeWidth={2} className="profile-chevron" />
         </button>
 
         {/* Popovers */}

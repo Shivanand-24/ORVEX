@@ -19,24 +19,34 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 
-  --orvex-bg: #0b0d12;
-  --orvex-surface: #11141b;
-  --orvex-surface-2: #171b24;
-  --orvex-border: #252a35;
+  --orvex-bg: #080a0f;
+  --orvex-surface: #10141c;
+  --orvex-surface-2: #151a23;
+  --orvex-surface-elevated: #1a202b;
+
+  --orvex-border: #252c38;
+  --orvex-border-light: #2d3543;
 
   --orvex-text: #f5f7fa;
-  --orvex-text-secondary: #9aa3b2;
-  --orvex-text-muted: #687181;
+  --orvex-text-secondary: #9aa4b2;
+  --orvex-text-muted: #687386;
 
-  --orvex-accent: #8b5cf6;
-  --orvex-accent-hover: #a78bfa;
+  --orvex-accent: #7c5cfc;
+  --orvex-accent-bright: #8b6cff;
+  --orvex-accent-hover: #9a82ff;
+  --orvex-accent-subtle: rgba(124, 92, 252, 0.10);
+  --orvex-accent-border: rgba(124, 92, 252, 0.35);
 
   --orvex-success: #22c55e;
   --orvex-warning: #f59e0b;
   --orvex-danger: #ef4444;
+  --orvex-info: #38bdf8;
 
-  --sidebar-width: 250px;
-  --topbar-height: 64px;
+  --sidebar-width: 260px;
+  --topbar-height: 60px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
 }
 
 /* =========================================================

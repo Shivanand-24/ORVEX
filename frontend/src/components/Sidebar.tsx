@@ -1,52 +1,95 @@
 import {
   BarChart3,
   Bot,
+  ChevronDown,
   Database,
   LayoutDashboard,
   Network,
   Settings,
+  Sparkles,
   Workflow,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
-const navigation = [
+type NavItem = {
+  label: string;
+  icon: typeof LayoutDashboard;
+  path: string;
+  badge?: string;
+};
+
+type NavGroup = {
+  title: string;
+  items: NavItem[];
+};
+
+const navigationGroups: NavGroup[] = [
   {
-    label: "Overview",
-    icon: LayoutDashboard,
-    path: "/",
+    title: "WORKSPACE",
+    items: [
+      {
+        label: "Overview",
+        icon: LayoutDashboard,
+        path: "/",
+      },
+      {
+        label: "AI Assistant",
+        icon: Bot,
+        path: "/assistant",
+        badge: "Copilot",
+      },
+      {
+        label: "Knowledge",
+        icon: Database,
+        path: "/knowledge",
+      },
+    ],
   },
   {
-    label: "AI Assistant",
-    icon: Bot,
-    path: "/assistant",
+    title: "AUTOMATION",
+    items: [
+      {
+        label: "Agents",
+        icon: Network,
+        path: "/agents",
+      },
+      {
+        label: "Workflows",
+        icon: Workflow,
+        path: "/workflows",
+      },
+    ],
   },
   {
-    label: "Knowledge",
-    icon: Database,
-    path: "/knowledge",
+    title: "OPERATIONS",
+    items: [
+      {
+        label: "Analytics",
+        icon: BarChart3,
+        path: "/analytics",
+      },
+    ],
   },
   {
-    label: "Agents",
-    icon: Network,
-    path: "/agents",
-  },
-  {
-    label: "Workflows",
-    icon: Workflow,
-    path: "/workflows",
-  },
-  {
-    label: "Analytics",
-    icon: BarChart3,
-    path: "/analytics",
+    title: "SYSTEM",
+    items: [
+      {
+        label: "Settings",
+        icon: Settings,
+        path: "/settings",
+      },
+    ],
   },
 ];
 
 function Sidebar() {
   return (
     <aside className="sidebar">
+      {/* Premium Brand Area */}
       <div className="sidebar-brand">
-        <div className="brand-mark">O</div>
+        <div className="brand-mark">
+          <Sparkles size={20} />
+        </div>
 
         <div className="brand-content">
           <h1>ORVEX</h1>
@@ -54,44 +97,48 @@ function Sidebar() {
         </div>
       </div>
 
+      {/* Grouped Navigation */}
       <nav className="sidebar-navigation">
-        {navigation.map((item) => {
-          const Icon = item.icon;
+        {navigationGroups.map((group) => (
+          <div key={group.title} className="navigation-group">
+            <span className="group-title">{group.title}</span>
 
-          return (
-            <NavLink
-              key={item.label}
-              to={item.path}
-              end={item.path === "/"}
-              className={({ isActive }) =>
-                `navigation-item ${isActive ? "active" : ""}`
-              }
-            >
-              <Icon size={18} />
-              <span>{item.label}</span>
-            </NavLink>
-          );
-        })}
+            <div className="group-items">
+              {group.items.map((item) => {
+                const Icon = item.icon;
+
+                return (
+                  <NavLink
+                    key={item.label}
+                    to={item.path}
+                    end={item.path === "/"}
+                    className={({ isActive }) =>
+                      `navigation-item ${isActive ? "active" : ""}`
+                    }
+                  >
+                    <span className="active-indicator" />
+                    <Icon size={18} className="item-icon" />
+                    <span className="item-label">{item.label}</span>
+                    {item.badge && <span className="item-badge">{item.badge}</span>}
+                  </NavLink>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
 
+      {/* Sidebar Footer — Workspace Switcher */}
       <div className="sidebar-footer">
-        <NavLink
-          to="/settings"
-          className={({ isActive }) =>
-            `navigation-item ${isActive ? "active" : ""}`
-          }
-        >
-          <Settings size={18} />
-          <span>Settings</span>
-        </NavLink>
-
-        <div className="workspace">
-          <div className="workspace-avatar">S</div>
+        <div className="workspace" role="button" tabIndex={0}>
+          <div className="workspace-avatar">E</div>
 
           <div className="workspace-info">
-            <strong>Workspace</strong>
-            <span>Enterprise</span>
+            <strong>Enterprise Workspace</strong>
+            <span>Production Tier</span>
           </div>
+
+          <ChevronDown size={14} className="workspace-chevron" />
         </div>
       </div>
     </aside>
