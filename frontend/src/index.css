@@ -392,14 +392,14 @@ a {
 .dashboard-card {
   min-width: 0;
   padding: 24px;
-  border: 1px solid #dde1e7;
-  border-radius: 10px;
-  background: #ffffff;
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+  border: 1px solid var(--orvex-border);
+  border-radius: var(--radius-lg);
+  background: var(--orvex-surface);
+  box-shadow: 0 1px 2px rgba(23, 26, 25, 0.04);
 }
 
 .large-card {
-  min-height: 414px;
+  min-height: 420px;
 }
 
 .card-header {
@@ -480,13 +480,13 @@ a {
 
 .chart-line {
   fill: none;
-  stroke: #3157d5;
+  stroke: var(--orvex-brand);
   stroke-width: 2.5;
   vector-effect: non-scaling-stroke;
 }
 
 .chart-svg circle {
-  fill: #3157d5;
+  fill: var(--orvex-brand);
   stroke: #ffffff;
   stroke-width: 2.5;
 }
@@ -571,8 +571,8 @@ a {
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  background: #e8edff;
-  color: #3157d5;
+  background: var(--orvex-brand-light);
+  color: var(--orvex-brand);
   font-size: 10px;
   font-weight: 700;
 }
@@ -831,9 +831,9 @@ a {
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  background: rgba(139, 92, 246, 0.12);
-  border: 1px solid rgba(139, 92, 246, 0.2);
-  color: var(--orvex-accent-hover);
+  background: var(--orvex-brand-light);
+  border: 1px solid var(--orvex-brand-border);
+  color: var(--orvex-brand);
   font-size: 11px;
   font-weight: 700;
 }
@@ -925,9 +925,9 @@ a {
 }
 
 .workflow-action:hover {
-  background: rgba(139, 92, 246, 0.12);
-  border-color: rgba(139, 92, 246, 0.4);
-  color: var(--orvex-accent-hover);
+  background: var(--orvex-brand-light);
+  border-color: var(--orvex-brand-border);
+  color: var(--orvex-brand);
 }
 
 /* =========================================================
@@ -1065,8 +1065,8 @@ a {
 
 .form-group input:focus,
 .form-group textarea:focus {
-  border-color: rgba(139, 92, 246, 0.65);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.08);
+  border-color: var(--orvex-brand);
+  box-shadow: 0 0 0 3px var(--orvex-brand-subtle);
 }
 
 /* Workflow Steps */
@@ -1177,9 +1177,9 @@ a {
 }
 
 .add-step-button:hover {
-  background: rgba(139, 92, 246, 0.06);
-  border-color: rgba(139, 92, 246, 0.45);
-  color: var(--orvex-accent-hover);
+  background: var(--orvex-brand-light);
+  border-color: var(--orvex-brand-border);
+  color: var(--orvex-brand);
 }
 
 /* =========================================================
@@ -1243,8 +1243,8 @@ a {
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  background: rgba(139, 92, 246, 0.08);
-  color: var(--orvex-accent-hover);
+  background: var(--orvex-brand-light);
+  color: var(--orvex-brand);
 }
 
 .step-delete-button {
@@ -1489,8 +1489,8 @@ a {
 }
 
 .workflow-config-card select:focus {
-  border-color: rgba(139, 92, 246, 0.65);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.08);
+  border-color: var(--orvex-brand);
+  box-shadow: 0 0 0 3px var(--orvex-brand-subtle);
 }
 
 /* Mobile */
@@ -1544,8 +1544,8 @@ a {
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  background: #e8edff;
-  color: #3157d5;
+  background: var(--orvex-brand-light);
+  color: var(--orvex-brand);
 }
 
 .agent-summary-card div:last-child {
@@ -1647,8 +1647,8 @@ a {
   align-items: center;
   justify-content: center;
   border-radius: 11px;
-  background: #e8edff;
-  color: #3157d5;
+  background: var(--orvex-brand-light);
+  color: var(--orvex-brand);
 }
 
 .agent-identity h3 {
@@ -1757,9 +1757,9 @@ a {
 }
 
 .agent-view-button:hover {
-  border-color: rgba(139, 92, 246, 0.45);
-  background: rgba(139, 92, 246, 0.08);
-  color: var(--orvex-accent-hover);
+  border-color: var(--orvex-brand);
+  background: var(--orvex-brand-light);
+  color: var(--orvex-brand);
 }
 
 /* Responsive */
@@ -1852,8 +1852,8 @@ a {
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  background: #e8edff;
-  color: #3157d5;
+  background: var(--orvex-brand-light);
+  color: var(--orvex-brand);
 }
 
 .knowledge-source-card h3 {
@@ -1898,8 +1898,8 @@ a {
 }
 
 .knowledge-search:focus-within {
-  border-color: #3157d5;
-  box-shadow: 0 0 0 3px rgba(49, 87, 213, 0.12);
+  border-color: var(--orvex-brand);
+  box-shadow: 0 0 0 3px var(--orvex-brand-subtle);
 }
 
 .knowledge-search input {
@@ -1947,7 +1947,7 @@ a {
 
 .knowledge-table td {
   padding: 15px 12px;
-  border-top: 1px solid #e2e5ea;
+  border-top: 1px solid var(--orvex-border);
   color: var(--orvex-text-secondary);
   font-size: 12px;
   white-space: nowrap;
@@ -1962,7 +1962,7 @@ a {
 .knowledge-table tbody tr:hover,
 .knowledge-table tbody tr:focus-visible,
 .knowledge-table tbody tr.selected {
-  background: #e8edff;
+  background: var(--orvex-brand-light);
 }
 
 .knowledge-document-name {
@@ -1974,7 +1974,7 @@ a {
 }
 
 .knowledge-document-name svg {
-  color: #3157d5;
+  color: var(--orvex-brand);
 }
 
 .knowledge-status {
@@ -2002,7 +2002,7 @@ a {
 }
 
 .knowledge-status.pending {
-  color: #3157d5;
+  color: var(--orvex-brand);
 }
 
 .knowledge-status.failed {
@@ -2027,7 +2027,7 @@ a {
 
 .knowledge-detail-eyebrow {
   margin: 0 0 6px;
-  color: #3157d5;
+  color: var(--orvex-brand);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
