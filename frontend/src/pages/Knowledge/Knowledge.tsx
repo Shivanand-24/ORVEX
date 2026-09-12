@@ -157,9 +157,11 @@ function Knowledge() {
       {/* Sources Grid */}
       <section className="knowledge-section" aria-labelledby="knowledge-sources-title">
         <div className="knowledge-section-header">
-          <div>
-            <h2 id="knowledge-sources-title">Knowledge Sources</h2>
-            <p>Collections organizing information for your workspace.</p>
+          <div className="orvex-rail-header">
+            <div>
+              <h2 id="knowledge-sources-title">Knowledge Sources</h2>
+              <p>Collections organizing information for your workspace.</p>
+            </div>
           </div>
         </div>
 
@@ -168,7 +170,7 @@ function Knowledge() {
             const sourceDocCount = documents.filter((doc) => doc.sourceId === source.id).length;
             return (
               <article className="knowledge-source-card" key={source.id}>
-                <div className="knowledge-source-icon">
+                <div className="knowledge-source-icon" style={{ background: "#E4F1EF", color: "#0E6B63" }}>
                   <Database size={20} />
                 </div>
                 <div>
@@ -186,9 +188,11 @@ function Knowledge() {
       <div className="knowledge-content-grid">
         <section className="dashboard-card knowledge-documents-card" aria-labelledby="knowledge-documents-title">
           <div className="knowledge-documents-header">
-            <div>
-              <h2 id="knowledge-documents-title">Document Directory</h2>
-              <p>Filter and inspect document readiness status.</p>
+            <div className="orvex-rail-header">
+              <div>
+                <h2 id="knowledge-documents-title">Document Directory</h2>
+                <p>Filter and inspect document readiness status.</p>
+              </div>
             </div>
 
             <label className="knowledge-search" htmlFor="knowledge-search-input">

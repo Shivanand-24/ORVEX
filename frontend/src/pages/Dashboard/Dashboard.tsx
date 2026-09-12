@@ -46,36 +46,7 @@ function Dashboard() {
   const activeWorkflowsCount = workflows.filter((w) => w.status === "Active").length;
   const indexedDocsCount = documents.filter((d) => d.readiness === "Indexed").length;
 
-  const stats = [
-    {
-      label: "Active Agents",
-      value: activeAgentsCount.toString(),
-      change: "+12.4% vs last period",
-      icon: Bot,
-      trend: "up",
-    },
-    {
-      label: "Active Workflows",
-      value: activeWorkflowsCount.toString(),
-      change: "+8.2% vs last period",
-      icon: Workflow,
-      trend: "up",
-    },
-    {
-      label: "RAG-Ready Knowledge",
-      value: indexedDocsCount.toString(),
-      change: `${documents.length} workspace documents`,
-      icon: Database,
-      trend: "neutral",
-    },
-    {
-      label: "System Uptime",
-      value: "99.99%",
-      change: "All core engines operational",
-      icon: CheckCircle2,
-      trend: "good",
-    },
-  ];
+
 
   const systemStatus = [
     { name: "AI Router & Assistant", status: "Operational", lat: "14ms" },
@@ -142,38 +113,49 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* KPI Stat Cards */}
-      <div className="stats-grid">
-        {stats.map((stat) => {
-          const StatIcon = stat.icon;
-          return (
-            <div className="stat-card" key={stat.label}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span>{stat.label}</span>
-                <div style={{ width: "32px", height: "32px", borderRadius: "6px", background: "#E4F1EF", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <StatIcon size={16} style={{ color: "#0E6B63" }} />
-                </div>
-              </div>
-              <strong>{stat.value}</strong>
-              <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                {stat.trend === "up" && <TrendingUp size={12} style={{ color: "#16745B" }} />}
-                <small style={{ color: stat.trend === "up" ? "#16745B" : "#59615D" }}>{stat.change}</small>
-              </div>
-            </div>
-          );
-        })}
+      {/* Executive Metric Strip */}
+      <div className="executive-metric-strip">
+        <div className="metric-strip-item">
+          <span className="metric-strip-label">Active Agents</span>
+          <div className="metric-strip-value">{activeAgentsCount}</div>
+          <div className="metric-strip-sub" style={{ color: "#16745B", display: "flex", alignItems: "center", gap: "4px" }}>
+            <TrendingUp size={12} /> +12.4% vs last period
+          </div>
+        </div>
+
+        <div className="metric-strip-item">
+          <span className="metric-strip-label">Active Workflows</span>
+          <div className="metric-strip-value">{activeWorkflowsCount}</div>
+          <div className="metric-strip-sub" style={{ color: "#16745B", display: "flex", alignItems: "center", gap: "4px" }}>
+            <TrendingUp size={12} /> +8.2% vs last period
+          </div>
+        </div>
+
+        <div className="metric-strip-item">
+          <span className="metric-strip-label">RAG-Ready Knowledge</span>
+          <div className="metric-strip-value">{indexedDocsCount}</div>
+          <div className="metric-strip-sub">{documents.length} workspace documents</div>
+        </div>
+
+        <div className="metric-strip-item">
+          <span className="metric-strip-label">System Uptime</span>
+          <div className="metric-strip-value">99.99%</div>
+          <div className="metric-strip-sub" style={{ color: "#16745B" }}>All core engines operational</div>
+        </div>
       </div>
 
-      {/* Intelligence Overview Chart + System Status */}
+      {/* Intelligence Overview Chart + Platform Health */}
       <div className="dashboard-grid" style={{ marginTop: "24px" }}>
         {/* Intelligence Overview */}
         <section className="dashboard-card large-card" style={{ padding: "24px" }}>
-          <div className="card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-            <div>
-              <h2 style={{ fontSize: "18px", fontWeight: 700, margin: 0, color: "#171A19" }}>Intelligence & Execution</h2>
-              <p style={{ fontSize: "13px", color: "#59615D", margin: "4px 0 0 0" }}>
-                Automated operations across agents, workflows and knowledge.
-              </p>
+          <div className="card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "16px" }}>
+            <div className="orvex-rail-header">
+              <div>
+                <h2 style={{ fontSize: "18px", fontWeight: 700, margin: 0, color: "#171A19" }}>INTELLIGENCE & EXECUTION</h2>
+                <p style={{ fontSize: "13px", color: "#59615D", margin: "4px 0 0 0" }}>
+                  Automated operations across agents, workflows and knowledge.
+                </p>
+              </div>
             </div>
 
             <div style={{ display: "flex", gap: "6px" }}>
@@ -193,6 +175,11 @@ function Dashboard() {
                 </button>
               ))}
             </div>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "baseline", gap: "10px", marginBottom: "16px", paddingLeft: "15px" }}>
+            <span style={{ fontSize: "32px", fontWeight: 700, color: "#171A19", letterSpacing: "-0.6px" }}>{summary.totalExecutions.toLocaleString()}</span>
+            <span style={{ fontSize: "13px", fontWeight: 500, color: "#59615D" }}>Total automated operations</span>
           </div>
 
           <div className="analytics-chart">
@@ -270,43 +257,52 @@ function Dashboard() {
           </div>
         </section>
 
-        {/* System Engine Status */}
-        <section className="dashboard-card" style={{ padding: "24px" }}>
-          <div className="card-header" style={{ marginBottom: "16px" }}>
-            <div>
-              <h2 style={{ fontSize: "18px", fontWeight: 700, margin: 0, color: "#171A19" }}>System Engine Status</h2>
-              <p style={{ fontSize: "13px", color: "#59615D", margin: "4px 0 0 0" }}>
-                Real-time operational health of core platform services
-              </p>
+        {/* Platform Health Status Panel */}
+        <section className="dashboard-card" style={{ padding: "24px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+          <div>
+            <div className="card-header" style={{ marginBottom: "16px" }}>
+              <div className="orvex-rail-header">
+                <div>
+                  <h2 style={{ fontSize: "18px", fontWeight: 700, margin: 0, color: "#171A19" }}>PLATFORM HEALTH</h2>
+                  <p style={{ fontSize: "12px", color: "#59615D", margin: "4px 0 0 0", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 600 }}>
+                    CORE ENGINES
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="status-list" style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              {systemStatus.map((service) => (
+                <div
+                  key={service.name}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "10px 14px",
+                    borderRadius: "6px",
+                    background: "#F5F3EE",
+                    border: "1px solid #D9D7D0",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <span className="status-badge-dot" style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#16745B" }} />
+                    <span style={{ fontSize: "13px", fontWeight: 600, color: "#171A19" }}>{service.name}</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ fontSize: "11px", color: "#8A918D" }}>{service.lat}</span>
+                    <span style={{ fontSize: "11px", fontWeight: 600, color: "#16745B", padding: "2px 8px", borderRadius: "4px", background: "#E4F1EF" }}>
+                      {service.status}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
-          <div className="status-list" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            {systemStatus.map((service) => (
-              <div
-                key={service.name}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "12px 14px",
-                  borderRadius: "6px",
-                  background: "#F5F3EE",
-                  border: "1px solid #D9D7D0",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <span className="status-badge-dot" style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#16745B" }} />
-                  <span style={{ fontSize: "13px", fontWeight: 600, color: "#171A19" }}>{service.name}</span>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span style={{ fontSize: "11px", color: "#8A918D" }}>{service.lat}</span>
-                  <span style={{ fontSize: "11px", fontWeight: 600, color: "#16745B", padding: "2px 8px", borderRadius: "4px", background: "#E4F1EF" }}>
-                    {service.status}
-                  </span>
-                </div>
-              </div>
-            ))}
+          <div style={{ marginTop: "16px", paddingTop: "12px", borderTop: "1px solid #D9D7D0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: "11px", fontWeight: 700, color: "#16745B", letterSpacing: "0.06em" }}>● ALL SYSTEMS OPERATIONAL</span>
+            <span style={{ fontSize: "11px", color: "#59615D" }}>99.99% platform availability</span>
           </div>
         </section>
       </div>
@@ -314,11 +310,13 @@ function Dashboard() {
       {/* Recent Workspace Activity */}
       <section className="dashboard-card activity-card" style={{ marginTop: "24px", padding: "24px" }}>
         <div className="card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
-          <div>
-            <h2 style={{ fontSize: "18px", fontWeight: 700, margin: 0, color: "#171A19" }}>Recent Workspace Activity</h2>
-            <p style={{ fontSize: "13px", color: "#59615D", margin: "4px 0 0 0" }}>
-              Live audit events across AI agents, workflows, and document ingestion.
-            </p>
+          <div className="orvex-rail-header">
+            <div>
+              <h2 style={{ fontSize: "18px", fontWeight: 700, margin: 0, color: "#171A19" }}>RECENT WORKSPACE ACTIVITY</h2>
+              <p style={{ fontSize: "13px", color: "#59615D", margin: "4px 0 0 0" }}>
+                Live audit events across AI agents, workflows, and document ingestion.
+              </p>
+            </div>
           </div>
 
           <button

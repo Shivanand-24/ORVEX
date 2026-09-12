@@ -97,8 +97,35 @@ a {
 }
 
 ::selection {
-  background: rgba(139, 92, 246, 0.35);
-  color: #ffffff;
+  background: rgba(14, 107, 99, 0.25);
+  color: #171a19;
+}
+
+/* =========================================================
+   ORVEX INTELLIGENCE RAIL (SIGNATURE ELEMENT)
+   ========================================================= */
+
+.orvex-rail {
+  position: relative;
+}
+
+.orvex-rail::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--orvex-brand);
+  border-radius: 2px;
+}
+
+.orvex-rail-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 12px;
+  border-left: 3px solid var(--orvex-brand);
 }
 
 /* =========================================================
@@ -106,8 +133,8 @@ a {
    ========================================================= */
 
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -115,17 +142,13 @@ a {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #303642;
-  border-radius: 999px;
+  background: var(--orvex-border-strong);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #454d5c;
+  background: var(--orvex-text-muted);
 }
-
-/* =========================================================
-   APPLICATION SHELL
-   ========================================================= */
 
 /* =========================================================
    APPLICATION SHELL & MAIN WORKSPACE
@@ -169,17 +192,18 @@ a {
   width: min(100%, 520px);
   padding: 32px;
   border: 1px solid var(--orvex-border);
-  border-radius: 13px;
+  border-radius: 10px;
   background: var(--orvex-surface);
-  box-shadow: 0 2px 8px rgba(16, 24, 40, 0.06);
+  box-shadow: 0 1px 3px rgba(23, 26, 25, 0.04);
 }
 
 .route-message-eyebrow {
   margin: 0 0 8px;
-  color: var(--orvex-accent);
-  font-size: 12px;
+  color: var(--orvex-brand);
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .route-message h1 {
@@ -216,16 +240,16 @@ a {
 
 .page-header h1 {
   margin: 0;
-  color: #111827;
+  color: var(--orvex-text);
   font-size: 32px;
   line-height: 1.2;
   font-weight: 700;
-  letter-spacing: -0.8px;
+  letter-spacing: -0.6px;
 }
 
 .page-header p {
   margin: 6px 0 0;
-  color: #596273;
+  color: var(--orvex-text-secondary);
   font-size: 14px;
 }
 
@@ -233,28 +257,86 @@ a {
 .primary-button {
   height: 40px;
   padding: 0 18px;
-  border: 1px solid #3157d5;
-  border-radius: 8px;
-  background: #3157d5;
+  border: 1px solid var(--orvex-brand);
+  border-radius: var(--radius-sm);
+  background: var(--orvex-brand);
   color: #ffffff;
   font-size: 13px;
   font-weight: 600;
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+  box-shadow: 0 1px 2px rgba(23, 26, 25, 0.05);
   transition: all 0.15s ease;
   cursor: pointer;
 }
 
 .primary-button:hover {
-  background: #2647b8;
-  border-color: #2647b8;
-  box-shadow: 0 2px 4px rgba(16, 24, 40, 0.08);
+  background: var(--orvex-brand-dark);
+  border-color: var(--orvex-brand-dark);
+  box-shadow: 0 2px 4px rgba(23, 26, 25, 0.08);
 }
 
 .primary-button:active {
-  background: #1e3894;
+  background: #063933;
 }
 
-/* STATISTICS KPI GRID */
+/* EXECUTIVE METRIC STRIP */
+.executive-metric-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  background: var(--orvex-surface);
+  border: 1px solid var(--orvex-border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 1px 2px rgba(23, 26, 25, 0.04);
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.metric-strip-item {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: background 0.15s ease;
+}
+
+.metric-strip-item:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 16px;
+  bottom: 16px;
+  width: 1px;
+  background: var(--orvex-border);
+}
+
+.metric-strip-item:hover {
+  background: rgba(245, 243, 238, 0.5);
+}
+
+.metric-strip-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--orvex-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.metric-strip-value {
+  margin-top: 8px;
+  font-size: 34px;
+  line-height: 1;
+  font-weight: 700;
+  color: var(--orvex-text);
+  letter-spacing: -0.6px;
+}
+
+.metric-strip-sub {
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--orvex-text-secondary);
+}
+
+/* LEGACY STATS GRID FALLBACK */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -263,29 +345,29 @@ a {
 }
 
 .stat-card {
-  min-height: 120px;
+  min-height: 110px;
   padding: 20px;
   display: flex;
   flex-direction: column;
-  border: 1px solid #dde1e7;
-  border-radius: 10px;
-  background: #ffffff;
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+  border: 1px solid var(--orvex-border);
+  border-radius: var(--radius-md);
+  background: var(--orvex-surface);
+  box-shadow: 0 1px 2px rgba(23, 26, 25, 0.04);
 }
 
 .stat-card span {
-  color: #596273;
-  font-size: 12px;
-  font-weight: 600;
+  color: var(--orvex-text-secondary);
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
 }
 
 .stat-card strong {
   display: block;
   margin-top: 8px;
-  color: #111827;
-  font-size: 28px;
+  color: var(--orvex-text);
+  font-size: 32px;
   line-height: 1;
   font-weight: 700;
   letter-spacing: -0.6px;
@@ -294,9 +376,9 @@ a {
 .stat-card small {
   display: block;
   margin-top: 10px;
-  color: #16845b;
+  color: var(--orvex-success);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 /* DASHBOARD GRID */
@@ -1294,6 +1376,7 @@ a {
 
 .workflow-step-selected {
   border-color: var(--orvex-brand);
+  border-left: 3px solid var(--orvex-brand);
   background: var(--orvex-brand-light);
   box-shadow: 0 0 0 1px var(--orvex-brand-border);
 }

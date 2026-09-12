@@ -214,9 +214,11 @@ function CreateWorkflow() {
       {/* Workflow Details */}
       <section className="dashboard-card workflow-builder-card">
         <div className="card-header">
-          <div>
-            <h2>Workflow Details</h2>
-            <p>Define the basic information for your workflow.</p>
+          <div className="orvex-rail-header">
+            <div>
+              <h2 style={{ fontSize: "18px", fontWeight: 700, margin: 0, color: "#171A19" }}>Workflow Details</h2>
+              <p style={{ fontSize: "13px", color: "#59615D", margin: "4px 0 0 0" }}>Define the basic information for your workflow.</p>
+            </div>
           </div>
         </div>
 
@@ -248,9 +250,11 @@ function CreateWorkflow() {
       {/* Workflow Steps */}
       <section className="dashboard-card workflow-builder-card">
         <div className="card-header">
-          <div>
-            <h2>Workflow Steps</h2>
-            <p>Define how ORVEX should execute this workflow.</p>
+          <div className="orvex-rail-header">
+            <div>
+              <h2 style={{ fontSize: "18px", fontWeight: 700, margin: 0, color: "#171A19" }}>Workflow Steps</h2>
+              <p style={{ fontSize: "13px", color: "#59615D", margin: "4px 0 0 0" }}>Define how ORVEX should execute this workflow.</p>
+            </div>
           </div>
         </div>
 

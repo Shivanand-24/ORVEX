@@ -102,9 +102,13 @@ function Workflows() {
       {/* Workflow List Section */}
       <section className="dashboard-card workflow-section">
         <div className="card-header">
-          <div>
-            <h2>Your Workflows</h2>
-            <p>Manage and monitor your enterprise automation pipelines.</p>
+          <div className="orvex-rail-header">
+            <div>
+              <h2 style={{ fontSize: "18px", fontWeight: 700, margin: 0, color: "#171A19" }}>Your Workflows</h2>
+              <p style={{ fontSize: "13px", color: "#59615D", margin: "4px 0 0 0" }}>
+                Manage and monitor your enterprise automation pipelines.
+              </p>
+            </div>
           </div>
 
           <div style={{ display: "flex", gap: "8px" }}>

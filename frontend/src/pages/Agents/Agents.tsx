@@ -147,7 +147,7 @@ function Agents() {
       {/* Summary Stat Cards */}
       <div className="agent-summary">
         <div className="agent-summary-card">
-          <div className="summary-icon">
+          <div className="summary-icon" style={{ background: "#E4F1EF", color: "#0E6B63" }}>
             <Bot size={20} />
           </div>
           <div>
@@ -157,7 +157,7 @@ function Agents() {
         </div>
 
         <div className="agent-summary-card">
-          <div className="summary-icon">
+          <div className="summary-icon" style={{ background: "#E4F1EF", color: "#0E6B63" }}>
             <Activity size={20} />
           </div>
           <div>
@@ -167,7 +167,7 @@ function Agents() {
         </div>
 
         <div className="agent-summary-card">
-          <div className="summary-icon">
+          <div className="summary-icon" style={{ background: "#E4F1EF", color: "#0E6B63" }}>
             <Play size={20} />
           </div>
           <div>
@@ -177,7 +177,7 @@ function Agents() {
         </div>
 
         <div className="agent-summary-card">
-          <div className="summary-icon">
+          <div className="summary-icon" style={{ background: "#E4F1EF", color: "#0E6B63" }}>
             <CheckCircle2 size={20} />
           </div>
           <div>

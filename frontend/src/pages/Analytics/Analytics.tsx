@@ -146,9 +146,11 @@ function Analytics() {
         {/* Execution Trend Line Chart */}
         <section className="dashboard-card large-card">
           <div className="card-header">
-            <div>
-              <h2 style={{ color: "#171A19" }}>Execution Volume Trend</h2>
-              <p style={{ color: "#59615D" }}>Automated execution volume over time ({timeRange.toUpperCase()})</p>
+            <div className="orvex-rail-header">
+              <div>
+                <h2 style={{ color: "#171A19", margin: 0 }}>EXECUTION VOLUME TREND</h2>
+                <p style={{ color: "#59615D", margin: "4px 0 0 0" }}>Automated execution volume over time ({timeRange.toUpperCase()})</p>
+              </div>
             </div>
           </div>
 
@@ -221,9 +223,11 @@ function Analytics() {
         {/* Agent Performance Breakdown */}
         <section className="dashboard-card">
           <div className="card-header">
-            <div>
-              <h2 style={{ color: "#171A19" }}>Agent Execution Leaderboard</h2>
-              <p style={{ color: "#59615D" }}>Top executing digital workers</p>
+            <div className="orvex-rail-header">
+              <div>
+                <h2 style={{ color: "#171A19", margin: 0 }}>AGENT LEADERBOARD</h2>
+                <p style={{ color: "#59615D", margin: "4px 0 0 0" }}>Top executing digital workers</p>
+              </div>
             </div>
           </div>
 
@@ -252,9 +256,11 @@ function Analytics() {
       {/* Execution Audit Log Table */}
       <section className="dashboard-card" style={{ marginTop: "24px" }}>
         <div className="card-header">
-          <div>
-            <h2 style={{ color: "#171A19" }}>Recent Execution Audit Logs</h2>
-            <p style={{ color: "#59615D" }}>Detailed log records of recent agent and workflow execution runs.</p>
+          <div className="orvex-rail-header">
+            <div>
+              <h2 style={{ color: "#171A19", margin: 0 }}>RECENT AUDIT LOGS</h2>
+              <p style={{ color: "#59615D", margin: "4px 0 0 0" }}>Detailed log records of recent agent and workflow execution runs.</p>
+            </div>
           </div>
         </div>
 
