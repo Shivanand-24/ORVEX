@@ -216,8 +216,9 @@ function Knowledge() {
                   padding: "4px 10px",
                   height: "30px",
                   textTransform: "capitalize",
-                  background: filterTab === tab ? "var(--orvex-surface-2)" : "transparent",
-                  borderColor: filterTab === tab ? "var(--orvex-accent)" : "transparent",
+                  background: filterTab === tab ? "#E4F1EF" : "transparent",
+                  borderColor: filterTab === tab ? "#0E6B63" : "transparent",
+                  color: filterTab === tab ? "#0E6B63" : "var(--orvex-text-secondary)",
                 }}
               >
                 {tab.replace("-", " ")}
@@ -250,7 +251,7 @@ function Knowledge() {
                   >
                     <td>
                       <span className="knowledge-document-name">
-                        <FileText size={16} />
+                        <FileText size={16} style={{ color: "#0E6B63" }} />
                         {doc.name}
                       </span>
                     </td>
@@ -279,7 +280,7 @@ function Knowledge() {
         <aside className="dashboard-card knowledge-detail-panel" aria-live="polite">
           {selectedDocument ? (
             <>
-              <div className="knowledge-detail-icon">
+              <div className="knowledge-detail-icon" style={{ background: "#E4F1EF", color: "#0E6B63" }}>
                 <FileText size={22} />
               </div>
               <p className="knowledge-detail-eyebrow">Document Details</p>
@@ -380,7 +381,7 @@ function Knowledge() {
                       </button>
                     </div>
                   ) : (
-                    <p style={{ color: "#16845b", fontSize: "13px", fontWeight: 600 }}>✓ RAG-Indexed & Ready for Assistant queries</p>
+                    <p style={{ color: "#16745B", fontSize: "13px", fontWeight: 600 }}>✓ RAG-Indexed & Ready for Assistant queries</p>
                   )}
                 </div>
               )}

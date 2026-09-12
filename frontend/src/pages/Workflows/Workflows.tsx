@@ -119,8 +119,9 @@ function Workflows() {
                   padding: "4px 10px",
                   height: "30px",
                   textTransform: "capitalize",
-                  background: statusTab === tab ? "var(--orvex-surface-2)" : "transparent",
-                  borderColor: statusTab === tab ? "var(--orvex-accent)" : "transparent",
+                  background: statusTab === tab ? "#E4F1EF" : "transparent",
+                  borderColor: statusTab === tab ? "#0E6B63" : "transparent",
+                  color: statusTab === tab ? "#0E6B63" : "var(--orvex-text-secondary)",
                 }}
               >
                 {tab}
@@ -133,7 +134,7 @@ function Workflows() {
           {filteredWorkflows.map((wf) => (
             <div className="workflow-item" key={wf.id}>
               <div className="workflow-main">
-                <div className="workflow-icon">
+                <div className="workflow-icon" style={{ background: "#E4F1EF", color: "#0E6B63" }}>
                   <WorkflowIcon size={20} />
                 </div>
 
@@ -193,8 +194,8 @@ function Workflows() {
             <div className="workflow-steps">
               {selectedWorkflow.steps.map((step, idx) => (
                 <div key={step.id} style={{ marginBottom: "12px" }}>
-                  <div className="workflow-step" style={{ background: "#f6f7f9", border: "1px solid #dde1e7" }}>
-                    <div className="step-number">{idx + 1}</div>
+                  <div className="workflow-step" style={{ background: "#F5F3EE", border: "1px solid #D9D7D0" }}>
+                    <div className="step-number" style={{ background: "#0E6B63", color: "#ffffff" }}>{idx + 1}</div>
                     <div className="step-content">
                       <strong>{step.title}</strong>
                       <span>{step.description}</span>
@@ -202,7 +203,7 @@ function Workflows() {
                     <span className="step-type">{step.type}</span>
                   </div>
                   {idx < selectedWorkflow.steps.length - 1 && (
-                    <div className="workflow-connector" />
+                    <div className="workflow-connector" style={{ background: "#C9C6BD" }} />
                   )}
                 </div>
               ))}

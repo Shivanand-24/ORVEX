@@ -91,8 +91,9 @@ function Analytics() {
               style={{
                 padding: "6px 12px",
                 fontSize: "13px",
-                background: timeRange === r ? "var(--orvex-surface-2)" : "transparent",
-                borderColor: timeRange === r ? "var(--orvex-accent)" : "var(--orvex-border)",
+                background: timeRange === r ? "#E4F1EF" : "transparent",
+                borderColor: timeRange === r ? "#0E6B63" : "#D9D7D0",
+                color: timeRange === r ? "#0E6B63" : "var(--orvex-text-secondary)",
               }}
             >
               {r.toUpperCase()}
@@ -106,37 +107,37 @@ function Analytics() {
         <div className="stat-card">
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span>Total AI Executions</span>
-            <Activity size={18} style={{ color: "#3157d5" }} />
+            <Activity size={18} style={{ color: "#0E6B63" }} />
           </div>
           <strong>{summary.totalExecutions.toLocaleString()}</strong>
-          <small>{summary.successRate} overall success rate</small>
+          <small style={{ color: "#16745B" }}>{summary.successRate} overall success rate</small>
         </div>
 
         <div className="stat-card">
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span>Successful Runs</span>
-            <CheckCircle2 size={18} style={{ color: "#16845b" }} />
+            <CheckCircle2 size={18} style={{ color: "#16745B" }} />
           </div>
           <strong>{summary.successfulExecutions.toLocaleString()}</strong>
-          <small>{summary.failedExecutions} failed executions</small>
+          <small style={{ color: "#59615D" }}>{summary.failedExecutions} failed executions</small>
         </div>
 
         <div className="stat-card">
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span>Avg Response Latency</span>
-            <Clock size={18} style={{ color: "#b7791f" }} />
+            <Clock size={18} style={{ color: "#B7794B" }} />
           </div>
           <strong>{summary.avgLatencyMs} ms</strong>
-          <small>Sub-second execution target</small>
+          <small style={{ color: "#59615D" }}>Sub-second execution target</small>
         </div>
 
         <div className="stat-card">
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span>RAG Knowledge Queries</span>
-            <Database size={18} style={{ color: "#3157d5" }} />
+            <Database size={18} style={{ color: "#0E6B63" }} />
           </div>
           <strong>{summary.ragReadyDocuments * 140}</strong>
-          <small>Across {summary.ragReadyDocuments} indexed documents</small>
+          <small style={{ color: "#59615D" }}>Across {summary.ragReadyDocuments} indexed documents</small>
         </div>
       </div>
 
@@ -146,8 +147,8 @@ function Analytics() {
         <section className="dashboard-card large-card">
           <div className="card-header">
             <div>
-              <h2>Execution Volume Trend</h2>
-              <p>Automated execution volume over time ({timeRange.toUpperCase()})</p>
+              <h2 style={{ color: "#171A19" }}>Execution Volume Trend</h2>
+              <p style={{ color: "#59615D" }}>Automated execution volume over time ({timeRange.toUpperCase()})</p>
             </div>
           </div>
 
@@ -172,8 +173,8 @@ function Analytics() {
               <svg className="chart-svg" viewBox="0 0 800 280" preserveAspectRatio="none">
                 <defs>
                   <linearGradient id="analyticsGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#3157d5" stopOpacity="0.2" />
-                    <stop offset="100%" stopColor="#3157d5" stopOpacity="0" />
+                    <stop offset="0%" stopColor="#0E6B63" stopOpacity="0.15" />
+                    <stop offset="100%" stopColor="#0E6B63" stopOpacity="0" />
                   </linearGradient>
                 </defs>
 
@@ -193,7 +194,7 @@ function Analytics() {
 
                 <path
                   className="chart-line"
-                  style={{ stroke: "#3157d5", strokeWidth: "2.5px" }}
+                  style={{ stroke: "#0E6B63", strokeWidth: "2.5px" }}
                   d="
                     M0 200
                     C100 180, 150 140, 250 160
@@ -202,10 +203,10 @@ function Analytics() {
                   "
                 />
 
-                <circle cx="0" cy="200" r="5" fill="#3157d5" />
-                <circle cx="250" cy="160" r="5" fill="#3157d5" />
-                <circle cx="500" cy="120" r="5" fill="#3157d5" />
-                <circle cx="800" cy="80" r="5" fill="#3157d5" />
+                <circle cx="0" cy="200" r="4" fill="#0E6B63" />
+                <circle cx="250" cy="160" r="4" fill="#0E6B63" />
+                <circle cx="500" cy="120" r="4" fill="#0E6B63" />
+                <circle cx="800" cy="80" r="4" fill="#0E6B63" />
               </svg>
 
               <div className="chart-labels">
@@ -221,8 +222,8 @@ function Analytics() {
         <section className="dashboard-card">
           <div className="card-header">
             <div>
-              <h2>Agent Execution Leaderboard</h2>
-              <p>Top executing digital workers</p>
+              <h2 style={{ color: "#171A19" }}>Agent Execution Leaderboard</h2>
+              <p style={{ color: "#59615D" }}>Top executing digital workers</p>
             </div>
           </div>
 
@@ -230,15 +231,15 @@ function Analytics() {
             {agents.map((ag) => (
               <div key={ag.id} style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
-                  <span style={{ fontWeight: 600, color: "#111827" }}>{ag.name}</span>
-                  <span style={{ color: "#596273" }}>{ag.executions} runs ({ag.successRate})</span>
+                  <span style={{ fontWeight: 600, color: "#171A19" }}>{ag.name}</span>
+                  <span style={{ color: "#59615D" }}>{ag.executions} runs ({ag.successRate})</span>
                 </div>
-                <div style={{ width: "100%", height: "8px", borderRadius: "999px", background: "#f0f2f5", overflow: "hidden" }}>
+                <div style={{ width: "100%", height: "6px", borderRadius: "4px", background: "#EEECE6", overflow: "hidden" }}>
                   <div
                     style={{
                       width: `${Math.min(100, (ag.executions / 250) * 100)}%`,
                       height: "100%",
-                      background: "#3157d5",
+                      background: "#0E6B63",
                     }}
                   />
                 </div>
@@ -252,8 +253,8 @@ function Analytics() {
       <section className="dashboard-card" style={{ marginTop: "24px" }}>
         <div className="card-header">
           <div>
-            <h2>Recent Execution Audit Logs</h2>
-            <p>Detailed log records of recent agent and workflow execution runs.</p>
+            <h2 style={{ color: "#171A19" }}>Recent Execution Audit Logs</h2>
+            <p style={{ color: "#59615D" }}>Detailed log records of recent agent and workflow execution runs.</p>
           </div>
         </div>
 
@@ -274,10 +275,10 @@ function Analytics() {
               {recentAuditLogs.map((log) => (
                 <tr key={log.id}>
                   <td>
-                    <code style={{ fontSize: "12px", color: "#3157d5", fontWeight: 600 }}>{log.id}</code>
+                    <code style={{ fontSize: "12px", color: "#0E6B63", fontWeight: 600 }}>{log.id}</code>
                   </td>
                   <td>
-                    <strong>{log.name}</strong>
+                    <strong style={{ color: "#171A19" }}>{log.name}</strong>
                   </td>
                   <td>{log.type}</td>
                   <td>{log.target}</td>

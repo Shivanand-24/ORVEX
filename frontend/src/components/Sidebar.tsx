@@ -61,7 +61,7 @@ const navigationGroups: NavGroup[] = [
     ],
   },
   {
-    title: "OPERATIONS",
+    title: "INSIGHTS",
     items: [
       {
         label: "Analytics",

@@ -189,8 +189,8 @@ function Agents() {
 
       {/* Toolbar Filters */}
       <div className="agents-toolbar" style={{ display: "flex", gap: "16px", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap" }}>
-        <div className="topbar-search" style={{ width: "320px", background: "#ffffff" }}>
-          <Search size={17} />
+        <div className="topbar-search" style={{ width: "320px", background: "#ffffff", border: "1px solid #D9D7D0" }}>
+          <Search size={17} style={{ color: "#8A918D" }} />
           <input
             type="search"
             value={searchQuery}
@@ -231,7 +231,7 @@ function Agents() {
           <div className="agent-card" key={agent.id}>
             <div className="agent-card-header">
               <div className="agent-identity">
-                <div className="agent-avatar" style={{ background: "#e8edff", color: "#3157d5" }}>
+                <div className="agent-avatar" style={{ background: "#E4F1EF", color: "#0E6B63" }}>
                   <Bot size={21} />
                 </div>
 
@@ -239,7 +239,7 @@ function Agents() {
                   <h3>{agent.name}</h3>
                   <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "4px" }}>
                     <StatusBadge status={agent.status} type="agent" />
-                    <span style={{ fontSize: "11px", color: "#8992a3" }}>{agent.domain}</span>
+                    <span style={{ fontSize: "11px", color: "#8A918D" }}>{agent.domain}</span>
                   </div>
                 </div>
               </div>
@@ -264,9 +264,9 @@ function Agents() {
                     fontSize: "11px",
                     padding: "2px 8px",
                     borderRadius: "4px",
-                    background: "#f0f2f5",
-                    border: "1px solid #dde1e7",
-                    color: "#596273",
+                    background: "#F5F3EE",
+                    border: "1px solid #D9D7D0",
+                    color: "#59615D",
                   }}
                 >
                   <Wrench size={10} style={{ marginRight: "4px" }} />
@@ -326,7 +326,7 @@ function Agents() {
           <div className="settings-section">
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
               <StatusBadge status={selectedAgent.status} type="agent" />
-              <span style={{ fontSize: "12px", color: "#596273" }}>
+              <span style={{ fontSize: "12px", color: "#59615D" }}>
                 Approval Required: <strong>{selectedAgent.requireApproval ? "Yes" : "No"}</strong>
               </span>
             </div>
@@ -337,7 +337,7 @@ function Agents() {
                 readOnly
                 rows={3}
                 value={selectedAgent.systemInstructions}
-                style={{ background: "#f6f7f9" }}
+                style={{ background: "#F5F3EE" }}
               />
             </div>
 
@@ -350,10 +350,10 @@ function Agents() {
                     style={{
                       padding: "6px 12px",
                       borderRadius: "6px",
-                      background: "#f0f2f5",
-                      border: "1px solid #dde1e7",
+                      background: "#F5F3EE",
+                      border: "1px solid #D9D7D0",
                       fontSize: "12px",
-                      color: "#111827",
+                      color: "#171A19",
                     }}
                   >
                     <Wrench size={12} style={{ marginRight: "6px" }} />
@@ -372,10 +372,10 @@ function Agents() {
                     style={{
                       padding: "6px 12px",
                       borderRadius: "6px",
-                      background: "#e8edff",
-                      border: "1px solid rgba(49, 87, 213, 0.25)",
+                      background: "#E4F1EF",
+                      border: "1px solid rgba(14, 107, 99, 0.25)",
                       fontSize: "12px",
-                      color: "#3157d5",
+                      color: "#0E6B63",
                       fontWeight: 500,
                     }}
                   >
@@ -480,9 +480,9 @@ function Agents() {
                     style={{
                       fontSize: "12px",
                       justifyContent: "flex-start",
-                      background: selected ? "#e8edff" : "#ffffff",
-                      borderColor: selected ? "#3157d5" : "#dde1e7",
-                      color: selected ? "#3157d5" : "#111827",
+                      background: selected ? "#E4F1EF" : "#ffffff",
+                      borderColor: selected ? "#0E6B63" : "#D9D7D0",
+                      color: selected ? "#0E6B63" : "#171A19",
                     }}
                   >
                     <Wrench size={12} /> {t}

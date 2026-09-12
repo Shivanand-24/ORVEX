@@ -190,11 +190,11 @@ function Assistant() {
         <main className="assistant-workspace">
           <div className="workspace-header">
             <div className="workspace-header-title">
-              <Sparkles size={18} style={{ color: "var(--orvex-accent-hover)" }} />
+              <Sparkles size={18} style={{ color: "#0E6B63" }} />
               <span>{activeConversation?.title || "AI Assistant Copilot"}</span>
             </div>
 
-            <span className="workspace-badge">Frontend Demo</span>
+            <span className="workspace-badge">ORVEX Intelligence</span>
           </div>
 
           {!activeConversation || activeConversation.messages.length === 0 ? (
@@ -219,7 +219,7 @@ function Assistant() {
                     onClick={() => handleSendMessage(item.prompt)}
                   >
                     <strong>
-                      <Zap size={14} style={{ color: "var(--orvex-accent-hover)" }} />
+                      <Zap size={14} style={{ color: "#0E6B63" }} />
                       {item.title}
                     </strong>
                     <span>{item.description}</span>
@@ -249,14 +249,14 @@ function Assistant() {
                           alignItems: "center",
                           gap: "8px",
                           fontSize: "11px",
-                          color: "var(--orvex-text-muted)",
-                          background: "rgba(139, 92, 246, 0.08)",
+                          color: "#59615D",
+                          background: "#E4F1EF",
                           padding: "3px 8px",
-                          borderRadius: "6px",
-                          border: "1px solid rgba(139, 92, 246, 0.2)",
+                          borderRadius: "4px",
+                          border: "1px solid rgba(14, 107, 99, 0.25)",
                         }}
                       >
-                        <Database size={12} style={{ color: "var(--orvex-accent-hover)" }} />
+                        <Database size={12} style={{ color: "#0E6B63" }} />
                         <span>Sources: Company Handbook & Product Docs • RAG Confidence: 98.4%</span>
                       </div>
                     )}

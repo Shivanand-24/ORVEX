@@ -33,7 +33,7 @@ function Topbar() {
 
         <input
           type="text"
-          placeholder="Search ORVEX across documents, agents, workflows..."
+          placeholder="Search ORVEX..."
           aria-label="Search ORVEX"
           readOnly
         />

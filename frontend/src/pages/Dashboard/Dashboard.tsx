@@ -130,7 +130,7 @@ function Dashboard() {
             type="button"
             onClick={() => navigate("/assistant")}
           >
-            <Sparkles size={15} style={{ color: "#3157d5" }} /> Ask Assistant
+            <Sparkles size={15} style={{ color: "#0E6B63" }} /> Ask Assistant
           </button>
           <button
             className="primary-button"
@@ -150,14 +150,14 @@ function Dashboard() {
             <div className="stat-card" key={stat.label}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span>{stat.label}</span>
-                <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "#e8edff", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <StatIcon size={16} style={{ color: "#3157d5" }} />
+                <div style={{ width: "32px", height: "32px", borderRadius: "6px", background: "#E4F1EF", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <StatIcon size={16} style={{ color: "#0E6B63" }} />
                 </div>
               </div>
               <strong>{stat.value}</strong>
               <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                {stat.trend === "up" && <TrendingUp size={12} style={{ color: "#16845b" }} />}
-                <small>{stat.change}</small>
+                {stat.trend === "up" && <TrendingUp size={12} style={{ color: "#16745B" }} />}
+                <small style={{ color: stat.trend === "up" ? "#16745B" : "#59615D" }}>{stat.change}</small>
               </div>
             </div>
           );
@@ -170,9 +170,9 @@ function Dashboard() {
         <section className="dashboard-card large-card" style={{ padding: "24px" }}>
           <div className="card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
             <div>
-              <h2 style={{ fontSize: "18px", fontWeight: 700, margin: 0 }}>Intelligence & Execution Overview</h2>
-              <p style={{ fontSize: "13px", color: "#596273", margin: "4px 0 0 0" }}>
-                Total automated operations across Agents, Workflows, and Knowledge queries.
+              <h2 style={{ fontSize: "18px", fontWeight: 700, margin: 0, color: "#171A19" }}>Intelligence & Execution</h2>
+              <p style={{ fontSize: "13px", color: "#59615D", margin: "4px 0 0 0" }}>
+                Automated operations across agents, workflows and knowledge.
               </p>
             </div>
 
@@ -216,8 +216,8 @@ function Dashboard() {
               <svg className="chart-svg" viewBox="0 0 800 280" preserveAspectRatio="none">
                 <defs>
                   <linearGradient id="dashboardChartGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#3157d5" stopOpacity="0.18" />
-                    <stop offset="100%" stopColor="#3157d5" stopOpacity="0" />
+                    <stop offset="0%" stopColor="#0E6B63" stopOpacity="0.12" />
+                    <stop offset="100%" stopColor="#0E6B63" stopOpacity="0" />
                   </linearGradient>
                 </defs>
 
@@ -240,7 +240,7 @@ function Dashboard() {
 
                 <path
                   className="chart-line"
-                  style={{ stroke: "#3157d5", strokeWidth: "2.5px" }}
+                  style={{ stroke: "#0E6B63", strokeWidth: "2.5px" }}
                   d="
                     M0 220
                     C70 205, 90 180, 140 190
@@ -252,13 +252,13 @@ function Dashboard() {
                   "
                 />
 
-                <circle cx="0" cy="220" r="4" fill="#3157d5" />
-                <circle cx="140" cy="190" r="4" fill="#3157d5" />
-                <circle cx="270" cy="165" r="4" fill="#3157d5" />
-                <circle cx="400" cy="135" r="4" fill="#3157d5" />
-                <circle cx="530" cy="110" r="4" fill="#3157d5" />
-                <circle cx="660" cy="95" r="4" fill="#3157d5" />
-                <circle cx="800" cy="70" r="4" fill="#3157d5" />
+                <circle cx="0" cy="220" r="4" fill="#0E6B63" />
+                <circle cx="140" cy="190" r="4" fill="#0E6B63" />
+                <circle cx="270" cy="165" r="4" fill="#0E6B63" />
+                <circle cx="400" cy="135" r="4" fill="#0E6B63" />
+                <circle cx="530" cy="110" r="4" fill="#0E6B63" />
+                <circle cx="660" cy="95" r="4" fill="#0E6B63" />
+                <circle cx="800" cy="70" r="4" fill="#0E6B63" />
               </svg>
 
               <div className="chart-labels">
@@ -274,9 +274,9 @@ function Dashboard() {
         <section className="dashboard-card" style={{ padding: "24px" }}>
           <div className="card-header" style={{ marginBottom: "16px" }}>
             <div>
-              <h2 style={{ fontSize: "18px", fontWeight: 700, margin: 0 }}>System Engine Status</h2>
-              <p style={{ fontSize: "13px", color: "#596273", margin: "4px 0 0 0" }}>
-                Real-time health of core platform microservices
+              <h2 style={{ fontSize: "18px", fontWeight: 700, margin: 0, color: "#171A19" }}>System Engine Status</h2>
+              <p style={{ fontSize: "13px", color: "#59615D", margin: "4px 0 0 0" }}>
+                Real-time operational health of core platform services
               </p>
             </div>
           </div>
@@ -289,19 +289,19 @@ function Dashboard() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  padding: "12px",
-                  borderRadius: "8px",
-                  background: "#f6f7f9",
-                  border: "1px solid #dde1e7",
+                  padding: "12px 14px",
+                  borderRadius: "6px",
+                  background: "#F5F3EE",
+                  border: "1px solid #D9D7D0",
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <span className="status-badge-dot" style={{ background: "#16845b" }} />
-                  <span style={{ fontSize: "13px", fontWeight: 600, color: "#111827" }}>{service.name}</span>
+                  <span className="status-badge-dot" style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#16745B" }} />
+                  <span style={{ fontSize: "13px", fontWeight: 600, color: "#171A19" }}>{service.name}</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span style={{ fontSize: "11px", color: "#8992a3" }}>{service.lat}</span>
-                  <span style={{ fontSize: "11px", fontWeight: 600, color: "#16845b", padding: "2px 8px", borderRadius: "4px", background: "#e8f5ef" }}>
+                  <span style={{ fontSize: "11px", color: "#8A918D" }}>{service.lat}</span>
+                  <span style={{ fontSize: "11px", fontWeight: 600, color: "#16745B", padding: "2px 8px", borderRadius: "4px", background: "#E4F1EF" }}>
                     {service.status}
                   </span>
                 </div>
@@ -315,8 +315,8 @@ function Dashboard() {
       <section className="dashboard-card activity-card" style={{ marginTop: "24px", padding: "24px" }}>
         <div className="card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
           <div>
-            <h2 style={{ fontSize: "18px", fontWeight: 700, margin: 0 }}>Recent Workspace Activity</h2>
-            <p style={{ fontSize: "13px", color: "#596273", margin: "4px 0 0 0" }}>
+            <h2 style={{ fontSize: "18px", fontWeight: 700, margin: 0, color: "#171A19" }}>Recent Workspace Activity</h2>
+            <p style={{ fontSize: "13px", color: "#59615D", margin: "4px 0 0 0" }}>
               Live audit events across AI agents, workflows, and document ingestion.
             </p>
           </div>
@@ -344,23 +344,23 @@ function Dashboard() {
                   alignItems: "center",
                   gap: "14px",
                   padding: "12px 14px",
-                  borderRadius: "8px",
-                  background: "#f6f7f9",
-                  border: "1px solid #dde1e7",
+                  borderRadius: "6px",
+                  background: "#FFFFFF",
+                  border: "1px solid #D9D7D0",
                   cursor: "pointer",
                   transition: "all 0.15s ease",
                 }}
               >
-                <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "#e8edff", color: "#3157d5", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <div style={{ width: "32px", height: "32px", borderRadius: "6px", background: "#E4F1EF", color: "#0E6B63", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <ActivityIcon size={16} />
                 </div>
 
                 <div style={{ flex: 1 }}>
-                  <strong style={{ fontSize: "13px", color: "#111827", display: "block" }}>{activity.message}</strong>
-                  <span style={{ fontSize: "11px", color: "#8992a3" }}>{activity.time}</span>
+                  <strong style={{ fontSize: "13px", color: "#171A19", display: "block" }}>{activity.message}</strong>
+                  <span style={{ fontSize: "11px", color: "#8A918D" }}>{activity.time}</span>
                 </div>
 
-                <ArrowRight size={14} style={{ color: "#8992a3" }} />
+                <ArrowRight size={14} style={{ color: "#8A918D" }} />
               </div>
             );
           })}

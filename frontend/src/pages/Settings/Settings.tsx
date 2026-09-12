@@ -263,7 +263,7 @@ function Settings() {
           {activeTab === "appearance" && (
             <div className="settings-section">
               <h2>Appearance & Interface Density</h2>
-              <p>Customize layout preferences for ORVEX Pearl Enterprise theme.</p>
+              <p>Customize layout preferences for ORVEX Editorial Enterprise theme.</p>
 
               <div className="toggle-group">
                 <div>
