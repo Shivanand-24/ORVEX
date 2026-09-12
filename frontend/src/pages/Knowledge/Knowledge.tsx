@@ -380,7 +380,7 @@ function Knowledge() {
                       </button>
                     </div>
                   ) : (
-                    <p style={{ color: "#22c55e", fontSize: "13px" }}>✓ RAG-Indexed & Ready for Assistant queries</p>
+                    <p style={{ color: "#16845b", fontSize: "13px", fontWeight: 600 }}>✓ RAG-Indexed & Ready for Assistant queries</p>
                   )}
                 </div>
               )}

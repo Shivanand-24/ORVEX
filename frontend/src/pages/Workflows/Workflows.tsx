@@ -193,7 +193,7 @@ function Workflows() {
             <div className="workflow-steps">
               {selectedWorkflow.steps.map((step, idx) => (
                 <div key={step.id} style={{ marginBottom: "12px" }}>
-                  <div className="workflow-step" style={{ background: "#0d1017" }}>
+                  <div className="workflow-step" style={{ background: "#f6f7f9", border: "1px solid #dde1e7" }}>
                     <div className="step-number">{idx + 1}</div>
                     <div className="step-content">
                       <strong>{step.title}</strong>

@@ -189,7 +189,7 @@ function Agents() {
 
       {/* Toolbar Filters */}
       <div className="agents-toolbar" style={{ display: "flex", gap: "16px", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap" }}>
-        <div className="topbar-search" style={{ width: "320px", background: "var(--orvex-surface)" }}>
+        <div className="topbar-search" style={{ width: "320px", background: "#ffffff" }}>
           <Search size={17} />
           <input
             type="search"
@@ -231,7 +231,7 @@ function Agents() {
           <div className="agent-card" key={agent.id}>
             <div className="agent-card-header">
               <div className="agent-identity">
-                <div className="agent-avatar">
+                <div className="agent-avatar" style={{ background: "#e8edff", color: "#3157d5" }}>
                   <Bot size={21} />
                 </div>
 
@@ -239,7 +239,7 @@ function Agents() {
                   <h3>{agent.name}</h3>
                   <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "4px" }}>
                     <StatusBadge status={agent.status} type="agent" />
-                    <span style={{ fontSize: "11px", color: "var(--orvex-text-muted)" }}>{agent.domain}</span>
+                    <span style={{ fontSize: "11px", color: "#8992a3" }}>{agent.domain}</span>
                   </div>
                 </div>
               </div>
@@ -264,9 +264,9 @@ function Agents() {
                     fontSize: "11px",
                     padding: "2px 8px",
                     borderRadius: "4px",
-                    background: "#0d1017",
-                    border: "1px solid var(--orvex-border)",
-                    color: "var(--orvex-text-secondary)",
+                    background: "#f0f2f5",
+                    border: "1px solid #dde1e7",
+                    color: "#596273",
                   }}
                 >
                   <Wrench size={10} style={{ marginRight: "4px" }} />
@@ -326,7 +326,7 @@ function Agents() {
           <div className="settings-section">
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
               <StatusBadge status={selectedAgent.status} type="agent" />
-              <span style={{ fontSize: "12px", color: "var(--orvex-text-secondary)" }}>
+              <span style={{ fontSize: "12px", color: "#596273" }}>
                 Approval Required: <strong>{selectedAgent.requireApproval ? "Yes" : "No"}</strong>
               </span>
             </div>
@@ -337,7 +337,7 @@ function Agents() {
                 readOnly
                 rows={3}
                 value={selectedAgent.systemInstructions}
-                style={{ background: "#0d1017" }}
+                style={{ background: "#f6f7f9" }}
               />
             </div>
 
@@ -350,10 +350,10 @@ function Agents() {
                     style={{
                       padding: "6px 12px",
                       borderRadius: "6px",
-                      background: "#0d1017",
-                      border: "1px solid var(--orvex-border)",
+                      background: "#f0f2f5",
+                      border: "1px solid #dde1e7",
                       fontSize: "12px",
-                      color: "var(--orvex-text)",
+                      color: "#111827",
                     }}
                   >
                     <Wrench size={12} style={{ marginRight: "6px" }} />
@@ -372,10 +372,11 @@ function Agents() {
                     style={{
                       padding: "6px 12px",
                       borderRadius: "6px",
-                      background: "rgba(139, 92, 246, 0.1)",
-                      border: "1px solid rgba(139, 92, 246, 0.3)",
+                      background: "#e8edff",
+                      border: "1px solid rgba(49, 87, 213, 0.25)",
                       fontSize: "12px",
-                      color: "var(--orvex-accent-hover)",
+                      color: "#3157d5",
+                      fontWeight: 500,
                     }}
                   >
                     <Database size={12} style={{ marginRight: "6px" }} />
@@ -479,8 +480,9 @@ function Agents() {
                     style={{
                       fontSize: "12px",
                       justifyContent: "flex-start",
-                      background: selected ? "rgba(139, 92, 246, 0.15)" : "#0d1017",
-                      borderColor: selected ? "var(--orvex-accent)" : "var(--orvex-border)",
+                      background: selected ? "#e8edff" : "#ffffff",
+                      borderColor: selected ? "#3157d5" : "#dde1e7",
+                      color: selected ? "#3157d5" : "#111827",
                     }}
                   >
                     <Wrench size={12} /> {t}

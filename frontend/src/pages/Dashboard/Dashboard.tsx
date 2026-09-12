@@ -130,7 +130,7 @@ function Dashboard() {
             type="button"
             onClick={() => navigate("/assistant")}
           >
-            <Sparkles size={15} style={{ color: "var(--orvex-accent-bright)" }} /> Ask Assistant
+            <Sparkles size={15} style={{ color: "#3157d5" }} /> Ask Assistant
           </button>
           <button
             className="primary-button"
@@ -150,13 +150,13 @@ function Dashboard() {
             <div className="stat-card" key={stat.label}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span>{stat.label}</span>
-                <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "rgba(124, 92, 252, 0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <StatIcon size={16} style={{ color: "var(--orvex-accent-bright)" }} />
+                <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "#e8edff", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <StatIcon size={16} style={{ color: "#3157d5" }} />
                 </div>
               </div>
               <strong>{stat.value}</strong>
               <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                {stat.trend === "up" && <TrendingUp size={12} style={{ color: "#22c55e" }} />}
+                {stat.trend === "up" && <TrendingUp size={12} style={{ color: "#16845b" }} />}
                 <small>{stat.change}</small>
               </div>
             </div>
@@ -171,7 +171,7 @@ function Dashboard() {
           <div className="card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
             <div>
               <h2 style={{ fontSize: "18px", fontWeight: 700, margin: 0 }}>Intelligence & Execution Overview</h2>
-              <p style={{ fontSize: "13px", color: "var(--orvex-text-secondary)", margin: "4px 0 0 0" }}>
+              <p style={{ fontSize: "13px", color: "#596273", margin: "4px 0 0 0" }}>
                 Total automated operations across Agents, Workflows, and Knowledge queries.
               </p>
             </div>
@@ -216,8 +216,8 @@ function Dashboard() {
               <svg className="chart-svg" viewBox="0 0 800 280" preserveAspectRatio="none">
                 <defs>
                   <linearGradient id="dashboardChartGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#7c5cfc" stopOpacity="0.3" />
-                    <stop offset="100%" stopColor="#7c5cfc" stopOpacity="0" />
+                    <stop offset="0%" stopColor="#3157d5" stopOpacity="0.18" />
+                    <stop offset="100%" stopColor="#3157d5" stopOpacity="0" />
                   </linearGradient>
                 </defs>
 
@@ -240,7 +240,7 @@ function Dashboard() {
 
                 <path
                   className="chart-line"
-                  style={{ stroke: "#8b6cff", strokeWidth: "2.5px" }}
+                  style={{ stroke: "#3157d5", strokeWidth: "2.5px" }}
                   d="
                     M0 220
                     C70 205, 90 180, 140 190
@@ -252,13 +252,13 @@ function Dashboard() {
                   "
                 />
 
-                <circle cx="0" cy="220" r="4" fill="#8b6cff" />
-                <circle cx="140" cy="190" r="4" fill="#8b6cff" />
-                <circle cx="270" cy="165" r="4" fill="#8b6cff" />
-                <circle cx="400" cy="135" r="4" fill="#8b6cff" />
-                <circle cx="530" cy="110" r="4" fill="#8b6cff" />
-                <circle cx="660" cy="95" r="4" fill="#8b6cff" />
-                <circle cx="800" cy="70" r="4" fill="#8b6cff" />
+                <circle cx="0" cy="220" r="4" fill="#3157d5" />
+                <circle cx="140" cy="190" r="4" fill="#3157d5" />
+                <circle cx="270" cy="165" r="4" fill="#3157d5" />
+                <circle cx="400" cy="135" r="4" fill="#3157d5" />
+                <circle cx="530" cy="110" r="4" fill="#3157d5" />
+                <circle cx="660" cy="95" r="4" fill="#3157d5" />
+                <circle cx="800" cy="70" r="4" fill="#3157d5" />
               </svg>
 
               <div className="chart-labels">
@@ -275,7 +275,7 @@ function Dashboard() {
           <div className="card-header" style={{ marginBottom: "16px" }}>
             <div>
               <h2 style={{ fontSize: "18px", fontWeight: 700, margin: 0 }}>System Engine Status</h2>
-              <p style={{ fontSize: "13px", color: "var(--orvex-text-secondary)", margin: "4px 0 0 0" }}>
+              <p style={{ fontSize: "13px", color: "#596273", margin: "4px 0 0 0" }}>
                 Real-time health of core platform microservices
               </p>
             </div>
@@ -291,17 +291,17 @@ function Dashboard() {
                   justifyContent: "space-between",
                   padding: "12px",
                   borderRadius: "8px",
-                  background: "var(--orvex-surface-2)",
-                  border: "1px solid var(--orvex-border)",
+                  background: "#f6f7f9",
+                  border: "1px solid #dde1e7",
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <span className="status-badge-dot" style={{ background: "#22c55e", boxShadow: "0 0 6px #22c55e" }} />
-                  <span style={{ fontSize: "13px", fontWeight: 600 }}>{service.name}</span>
+                  <span className="status-badge-dot" style={{ background: "#16845b" }} />
+                  <span style={{ fontSize: "13px", fontWeight: 600, color: "#111827" }}>{service.name}</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span style={{ fontSize: "11px", color: "var(--orvex-text-muted)" }}>{service.lat}</span>
-                  <span style={{ fontSize: "11px", fontWeight: 600, color: "#22c55e", padding: "2px 8px", borderRadius: "4px", background: "rgba(34, 197, 94, 0.1)" }}>
+                  <span style={{ fontSize: "11px", color: "#8992a3" }}>{service.lat}</span>
+                  <span style={{ fontSize: "11px", fontWeight: 600, color: "#16845b", padding: "2px 8px", borderRadius: "4px", background: "#e8f5ef" }}>
                     {service.status}
                   </span>
                 </div>
@@ -316,7 +316,7 @@ function Dashboard() {
         <div className="card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
           <div>
             <h2 style={{ fontSize: "18px", fontWeight: 700, margin: 0 }}>Recent Workspace Activity</h2>
-            <p style={{ fontSize: "13px", color: "var(--orvex-text-secondary)", margin: "4px 0 0 0" }}>
+            <p style={{ fontSize: "13px", color: "#596273", margin: "4px 0 0 0" }}>
               Live audit events across AI agents, workflows, and document ingestion.
             </p>
           </div>
@@ -345,22 +345,22 @@ function Dashboard() {
                   gap: "14px",
                   padding: "12px 14px",
                   borderRadius: "8px",
-                  background: "var(--orvex-surface-2)",
-                  border: "1px solid var(--orvex-border)",
+                  background: "#f6f7f9",
+                  border: "1px solid #dde1e7",
                   cursor: "pointer",
                   transition: "all 0.15s ease",
                 }}
               >
-                <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "rgba(124, 92, 252, 0.12)", color: "var(--orvex-accent-bright)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "#e8edff", color: "#3157d5", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <ActivityIcon size={16} />
                 </div>
 
                 <div style={{ flex: 1 }}>
-                  <strong style={{ fontSize: "13px", color: "var(--orvex-text)", display: "block" }}>{activity.message}</strong>
-                  <span style={{ fontSize: "11px", color: "var(--orvex-text-muted)" }}>{activity.time}</span>
+                  <strong style={{ fontSize: "13px", color: "#111827", display: "block" }}>{activity.message}</strong>
+                  <span style={{ fontSize: "11px", color: "#8992a3" }}>{activity.time}</span>
                 </div>
 
-                <ArrowRight size={14} style={{ color: "var(--orvex-text-muted)" }} />
+                <ArrowRight size={14} style={{ color: "#8992a3" }} />
               </div>
             );
           })}

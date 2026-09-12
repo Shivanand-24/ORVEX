@@ -1,5 +1,5 @@
 /* =========================================================
-   SETTINGS PAGE STYLES
+   SETTINGS PAGE STYLES (PEARL ENTERPRISE)
    ========================================================= */
 
 .settings-page {
@@ -21,9 +21,9 @@
   flex-direction: column;
   gap: 4px;
   padding: 8px;
-  border-radius: 12px;
-  background: var(--orvex-surface);
-  border: 1px solid var(--orvex-border);
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid #dde1e7;
 }
 
 .settings-tab-button {
@@ -32,10 +32,10 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  border: none;
+  border: 1px solid transparent;
   border-radius: 8px;
   background: transparent;
-  color: var(--orvex-text-secondary);
+  color: #596273;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -44,41 +44,42 @@
 }
 
 .settings-tab-button:hover {
-  background: var(--orvex-surface-2);
-  color: var(--orvex-text);
+  background: #f0f2f5;
+  color: #111827;
 }
 
 .settings-tab-button.active {
-  background: rgba(139, 92, 246, 0.14);
-  color: var(--orvex-text);
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  background: #e8edff;
+  color: #3157d5;
+  border: 1px solid rgba(49, 87, 213, 0.25);
+  font-weight: 600;
 }
 
 .settings-tab-button.active svg {
-  color: var(--orvex-accent-hover);
+  color: #3157d5;
 }
 
 .settings-content-card {
   flex: 1;
   min-width: 0;
   padding: 28px;
-  border-radius: 14px;
-  background: var(--orvex-surface);
-  border: 1px solid var(--orvex-border);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #dde1e7;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
 }
 
 .settings-section h2, .settings-form h2 {
   margin: 0 0 4px 0;
   font-size: 20px;
   font-weight: 700;
-  color: var(--orvex-text);
+  color: #111827;
 }
 
 .settings-section p, .settings-form p {
   margin: 0 0 24px 0;
   font-size: 13px;
-  color: var(--orvex-text-secondary);
+  color: #596273;
 }
 
 .form-group {
@@ -91,7 +92,7 @@
 .form-group label {
   font-size: 13px;
   font-weight: 600;
-  color: var(--orvex-text);
+  color: #111827;
 }
 
 .form-group input[type="text"],
@@ -100,16 +101,22 @@
   width: 100%;
   padding: 10px 14px;
   border-radius: 8px;
-  border: 1px solid var(--orvex-border);
-  background: #0d1017;
-  color: var(--orvex-text);
+  border: 1px solid #dde1e7;
+  background: #ffffff;
+  color: #111827;
   font-size: 13px;
   outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-group input[type="text"]::placeholder,
+.form-group textarea::placeholder {
+  color: #8992a3;
 }
 
 .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
-  border-color: var(--orvex-accent);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
+  border-color: #3157d5;
+  box-shadow: 0 0 0 3px rgba(49, 87, 213, 0.12);
 }
 
 .settings-info-grid {
@@ -121,8 +128,8 @@
 .info-card {
   padding: 18px;
   border-radius: 10px;
-  background: #0d1017;
-  border: 1px solid var(--orvex-border);
+  background: #f6f7f9;
+  border: 1px solid #dde1e7;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -130,17 +137,17 @@
 
 .info-card span {
   font-size: 12px;
-  color: var(--orvex-text-secondary);
+  color: #596273;
 }
 
 .info-card strong {
   font-size: 16px;
-  color: var(--orvex-text);
+  color: #111827;
 }
 
 .info-card small {
   font-size: 11px;
-  color: var(--orvex-text-muted);
+  color: #8992a3;
 }
 
 .toggle-group {
@@ -149,21 +156,21 @@
   justify-content: space-between;
   padding: 16px;
   border-radius: 10px;
-  background: #0d1017;
-  border: 1px solid var(--orvex-border);
+  background: #f6f7f9;
+  border: 1px solid #dde1e7;
   margin-bottom: 14px;
 }
 
 .toggle-group strong {
   font-size: 13px;
-  color: var(--orvex-text);
+  color: #111827;
   display: block;
 }
 
 .toggle-group p {
   margin: 2px 0 0 0 !important;
   font-size: 12px !important;
-  color: var(--orvex-text-secondary);
+  color: #596273;
 }
 
 .api-key-box {
@@ -172,15 +179,15 @@
   gap: 12px;
   padding: 8px 12px;
   border-radius: 8px;
-  background: #0d1017;
-  border: 1px solid var(--orvex-border);
+  background: #f6f7f9;
+  border: 1px solid #dde1e7;
 }
 
 .api-key-box code {
   flex: 1;
   font-family: monospace;
   font-size: 13px;
-  color: var(--orvex-accent-hover);
+  color: #3157d5;
 }
 
 @media (max-width: 800px) {
