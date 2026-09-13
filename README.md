@@ -1,8 +1,20 @@
-# ORVEX
+# ORVEX — Enterprise Intelligence & Automation Platform
 
-## Frontend setup
+ORVEX is an enterprise-oriented AI platform designed to combine intelligent knowledge retrieval, AI agents, workflow automation, analytics, and enterprise security into a unified web application.
 
-This repository currently contains the React frontend only; no backend, authentication, or external AI integration is connected yet.
+---
+
+## Repository Architecture
+
+- **`frontend/`**: React + TypeScript + Vite single-page application built with the ORVEX Pearl Enterprise Intelligence design system.
+- **`backend/`**: Python + FastAPI RESTful backend service foundation providing configuration, CORS, error handling, health endpoints, and automated tests.
+- **`docs/`**: Product specifications, requirements, and architecture documentation.
+
+---
+
+## Getting Started
+
+### 1. Frontend Setup
 
 Requirements: Node.js 20.19+ or 22.12+ (required by Vite 8) and npm.
 
@@ -12,74 +24,60 @@ npm install
 npm run dev
 ```
 
-Open the local URL printed by Vite. Use `npm run build` for a production type-check/build, `npm run lint` for Oxlint, and `npm run preview` to preview the production bundle.
+Open the local URL printed by Vite (default: `http://localhost:5173`).
 
-## Current frontend architecture
+Useful scripts:
+- `npm run build`: Production TypeScript check and Vite build
+- `npm run lint`: Code quality linting via Oxlint
+- `npm run preview`: Preview production build bundle
 
-- `frontend/src/routes`: browser routes and route safety fallbacks.
-- `frontend/src/layouts` and `components`: shared application shell.
-- `frontend/src/pages`: feature screens.
-- `frontend/src/types`: small shared frontend domain types.
-- `frontend/src/services`: in-memory repositories that can later be replaced by API-backed implementations.
+### 2. Backend Setup
 
-The dashboard and workflow builder are frontend prototypes. Knowledge, Assistant, and Analytics are still placeholders. Product requirements are in `docs/requirements.md`.
+Requirements: Python 3.12+.
 
-## Enterprise AI Intelligence & Automation Platform
+```bash
+cd backend
+python -m venv .venv
+```
 
-ORVEX is an enterprise-oriented AI platform designed to combine
-intelligent knowledge retrieval, AI agents, workflow automation,
-analytics, and enterprise security into a unified web application.
+Activate environment:
+- **Windows (PowerShell)**: `\.venv\Scripts\Activate.ps1`
+- **macOS / Linux**: `source .venv/bin/activate`
 
-## Vision
+Install dependencies and start dev server:
 
-Build a production-ready AI platform capable of helping organizations
-retrieve knowledge, analyze information, automate workflows, and make
-better data-driven decisions.
+```bash
+pip install -r requirements.txt
+cp .env.example .env
+uvicorn app.main:app --reload --port 8000
+```
 
-## Core Capabilities
+Backend URLs:
+- API Base: `http://localhost:8000/api/v1`
+- Health Endpoint: `http://localhost:8000/api/v1/health`
+- Interactive OpenAPI Docs: `http://localhost:8000/api/v1/docs`
 
-- AI Assistant
-- Retrieval-Augmented Generation (RAG)
-- AI Agents
-- Tool Calling
-- Workflow Automation
-- Document Intelligence
-- Data Analytics
-- Role-Based Access Control
-- Human-in-the-Loop Approval
-- Audit Logging
-- AI Evaluation
-- Cloud Deployment
+Run backend test suite:
 
-## Planned Technology Stack
+```bash
+pytest
+```
 
-### Frontend
-- React
-- TypeScript
-- HTML
-- CSS
+---
 
-### Backend
-- Python
-- FastAPI
+## Core Capabilities & Vision
 
-### Database
-- PostgreSQL
+- AI Assistant & Retrieval-Augmented Generation (RAG)
+- AI Agents & Graph Workflows
+- Document Intelligence & Search
+- Data Analytics & Telemetry
+- Role-Based Access Control (RBAC) & Enterprise Security
 
-### AI
-- Large Language Models
-- RAG
-- Embeddings
-- Vector Search
-- Agentic AI
+---
 
-### DevOps
-- Git
-- GitHub
-- Docker
-- CI/CD
-- Cloud Deployment
+## Technology Stack
 
-## Project Status
-
-🚧 Currently under active development.
+- **Frontend**: React 19, TypeScript, Vite 8, Lucide React, Vanilla CSS
+- **Backend**: Python 3.12, FastAPI, Uvicorn, Pydantic v2, Pytest
+- **Database (Planned)**: PostgreSQL
+- **AI Engine (Planned)**: LLM Orchestration, Embeddings, Vector Search
