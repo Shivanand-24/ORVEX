@@ -1,17 +1,18 @@
-# ORVEX Backend Foundation
+# ORVEX Backend & Database Layer
 
 Welcome to the backend foundation for **ORVEX**, an Enterprise Intelligence & Automation Platform.
 
 ## Overview
 
-The ORVEX backend is a high-performance RESTful API service built with **Python 3.12+** and **FastAPI**. It is designed to serve as the backend application foundation connecting the React enterprise frontend with security, data persistence, AI orchestration, knowledge retrieval (RAG), and agentic workflows in future milestones.
+The ORVEX backend is a high-performance RESTful API service built with **Python 3.12+**, **FastAPI**, **SQLAlchemy 2.x**, **asyncpg**, and **PostgreSQL 16**.
 
-### Why FastAPI?
+### Core Stack & Architecture
 
-- **High Performance**: Asynchronous Python micro-framework powered by Starlette and Pydantic.
-- **Type Safety & Data Validation**: Native Pydantic integration enforces strict request/response data contracts.
-- **Automatic OpenAPI Documentation**: Generates interactive API docs (`/api/v1/docs` and `/api/v1/redoc`) out of the box.
-- **Developer Ergonomics**: Modern Python async capabilities, intuitive routing, and lightweight footprint.
+- **Web Framework**: FastAPI (powered by Starlette & Pydantic v2)
+- **ORM & Database**: SQLAlchemy 2.x (AsyncEngine, AsyncSession) with `asyncpg` driver
+- **Migrations**: Alembic with version-controlled revision scripts
+- **Database Engine**: PostgreSQL 16 (Local via Docker Compose)
+- **Testing**: Pytest with metadata & connection health tests
 
 ---
 
@@ -19,35 +20,51 @@ The ORVEX backend is a high-performance RESTful API service built with **Python 
 
 ```text
 backend/
+├── alembic/               # Alembic database migrations
+│   ├── versions/
+│   │   └── 0001_initial_schema.py
+│   ├── env.py
+│   └── script.py.mako
+│
 ├── app/
-│   ├── __init__.py
-│   ├── main.py            # Application initialization & setup
+│   ├── main.py            # FastAPI app factory & lifespan
 │   │
-│   ├── core/              # Configuration, CORS, error handlers
-│   │   ├── __init__.py
+│   ├── core/              # Configuration, CORS, error handling
 │   │   ├── config.py
 │   │   ├── cors.py
 │   │   └── errors.py
 │   │
-│   ├── api/               # API route definitions & versioning
-│   │   ├── __init__.py
-│   │   └── v1/
-│   │       ├── __init__.py
-│   │       ├── router.py  # Master v1 router
-│   │       └── health.py  # Health check endpoint
+│   ├── db/                # Database engine & session providers
+│   │   ├── base.py        # Base metadata & model export
+│   │   └── session.py     # AsyncSessionLocal & get_db_session dependency
 │   │
-│   └── schemas/           # Pydantic data schemas
-│       ├── __init__.py
+│   ├── models/            # SQLAlchemy 2.x declarative models (14 tables)
+│   │   ├── base.py        # Base & TimestampMixin
+│   │   ├── organization.py # Organization
+│   │   ├── user.py         # User
+│   │   ├── membership.py   # OrganizationMembership
+│   │   ├── knowledge.py    # KnowledgeSource & KnowledgeDocument
+│   │   ├── assistant.py    # Conversation & AssistantMessage
+│   │   ├── agent.py        # Agent, AgentKnowledgeSource & AgentTool
+│   │   ├── workflow.py     # Workflow, WorkflowStep & WorkflowExecution
+│   │   └── audit.py        # AuditLog
+│   │
+│   ├── api/v1/            # API endpoints
+│   │   ├── router.py      # Master v1 router
+│   │   └── health.py      # Service & DB health check endpoints
+│   │
+│   └── schemas/           # Pydantic request/response schemas
 │       └── health.py
 │
-├── tests/                 # Pytest test suite
-│   ├── __init__.py
-│   └── test_health.py
+├── tests/                 # Pytest suite
+│   ├── test_health.py
+│   ├── test_db_models.py
+│   └── test_db_health.py
 │
+├── alembic.ini            # Alembic configuration
 ├── .env.example           # Environment template configuration
-├── .gitignore             # Python/Git ignore rules
-├── requirements.txt       # Production & dev dependencies
-└── README.md              # Backend documentation
+├── requirements.txt       # Python dependencies
+└── README.md
 ```
 
 ---
@@ -56,86 +73,80 @@ backend/
 
 ### 1. Requirements
 
-- Python **3.12** or higher installed.
+- Python **3.12+**
+- Docker & Docker Compose (for local PostgreSQL 16)
 
-### 2. Create Virtual Environment
-
-Navigate to the `backend/` directory and create a Python virtual environment:
+### 2. Create & Activate Virtual Environment
 
 ```bash
 cd backend
 python -m venv .venv
 ```
 
-Activate the virtual environment:
-
-- **Windows (PowerShell)**:
-  ```powershell
-  \.venv\Scripts\Activate.ps1
-  ```
-- **Windows (CMD)**:
-  ```cmd
-  \.venv\Scripts\activate.bat
-  ```
-- **macOS / Linux**:
-  ```bash
-  source .venv/bin/activate
-  ```
+Activate:
+- **Windows (PowerShell)**: `\.venv\Scripts\Activate.ps1`
+- **macOS / Linux**: `source .venv/bin/activate`
 
 ### 3. Install Dependencies
-
-With the virtual environment activated, install dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Configure Environment Variables
+### 4. Local PostgreSQL Setup (Docker Compose)
 
-Copy `.env.example` to create your local `.env` configuration:
+Start the PostgreSQL 16 container from the project root:
+
+```bash
+# From project root directory:
+docker compose up -d
+```
+
+To stop PostgreSQL:
+```bash
+docker compose down
+```
+
+### 5. Environment Configuration
+
+Copy `.env.example` to `.env`:
 
 ```bash
 cp .env.example .env
 ```
 
-Default settings in `.env.example`:
+Default connection settings:
 
 ```env
-APP_NAME="ORVEX API"
-APP_ENV="development"
-API_V1_PREFIX="/api/v1"
-CORS_ORIGINS=["http://localhost:5173"]
-LOG_LEVEL="INFO"
+DATABASE_URL="postgresql+asyncpg://orvex_user:orvex_dev_secret@localhost:5432/orvex_db"
+SYNC_DATABASE_URL="postgresql+psycopg2://orvex_user:orvex_dev_secret@localhost:5432/orvex_db"
 ```
 
-> **Note**: Do not commit your `.env` file to version control.
+### 6. Run Database Migrations (Alembic)
+
+Apply all 14 schema tables to the running PostgreSQL database:
+
+```bash
+alembic upgrade head
+```
 
 ---
 
-## Running Development Server
+## Running Development Server & Tests
 
-Start the Uvicorn development server with auto-reload enabled:
+### Start FastAPI Server
 
 ```bash
 uvicorn app.main:app --reload --port 8000
 ```
 
-Once running:
-- Health Endpoint: [http://localhost:8000/api/v1/health](http://localhost:8000/api/v1/health)
-- Swagger OpenAPI Docs: [http://localhost:8000/api/v1/docs](http://localhost:8000/api/v1/docs)
-- ReDoc Docs: [http://localhost:8000/api/v1/redoc](http://localhost:8000/api/v1/redoc)
+Endpoints:
+- API Base: `http://localhost:8000/api/v1`
+- Service Health: `http://localhost:8000/api/v1/health`
+- Database Health: `http://localhost:8000/api/v1/health/db`
+- Interactive OpenAPI Docs: `http://localhost:8000/api/v1/docs`
 
----
-
-## Running Tests
-
-Execute unit tests using `pytest`:
-
-```bash
-pytest
-```
-
-To run with verbose output:
+### Run Test Suite
 
 ```bash
 pytest -v
@@ -143,30 +154,21 @@ pytest -v
 
 ---
 
-## API Health Endpoint
+## Database Architecture (14 Tables)
 
-### `GET /api/v1/health`
-
-Returns operational status of the backend API.
-
-#### Response (HTTP 200 OK):
-
-```json
-{
-  "status": "ok",
-  "service": "ORVEX API",
-  "version": "v1"
-}
-```
-
----
-
-## Future Roadmap
-
-The backend foundation will evolve across future milestones:
-
-1. **Database Layer**: PostgreSQL integration, SQLAlchemy ORM models, and Alembic migrations.
-2. **Authentication & RBAC**: OAuth2 / JWT authentication, user management, role-based access control.
-3. **AI Assistant & RAG Engine**: Vector search, embeddings, document ingestion, and LLM orchestration.
-4. **Agent & Workflow Engine**: Autonomous AI agent execution loops and workflow graph runner.
-5. **Analytics & Audit Logging**: Usage telemetry, execution logs, and compliance audit trail.
+| Entity Table | Primary Key | Key Columns / Constraints |
+| :--- | :--- | :--- |
+| `organizations` | UUID | `slug` (UNIQUE) |
+| `users` | UUID | `email` (UNIQUE) |
+| `organization_memberships` | UUID | `(organization_id, user_id)` UNIQUE, role CHECK |
+| `knowledge_sources` | UUID | `organization_id` (FK CASCADE) |
+| `knowledge_documents` | UUID | `source_id` (FK CASCADE), `processing_status`, `indexing_status` |
+| `conversations` | UUID | `user_id` (FK CASCADE), `organization_id` (FK CASCADE) |
+| `messages` | UUID | `conversation_id` (FK CASCADE), role CHECK |
+| `agents` | UUID | `organization_id` (FK CASCADE), `created_by_user_id` (FK RESTRICT) |
+| `agent_knowledge_sources` | Composite `(agent_id, source_id)` | FK CASCADE |
+| `agent_tools` | Composite `(agent_id, tool_name)` | Application Tool Registry mapping |
+| `workflows` | UUID | `organization_id` (FK CASCADE), `created_by_user_id` (FK RESTRICT) |
+| `workflow_steps` | UUID | `workflow_id` (FK CASCADE), `config` (JSONB), `next_step_ids` (JSONB) |
+| `workflow_executions` | UUID | `workflow_id` (FK CASCADE), `execution_log` (JSONB) |
+| `audit_logs` | UUID | `organization_id` (FK CASCADE), `actor_id` (FK SET NULL), `details` (JSONB) |

@@ -7,8 +7,8 @@ ORVEX is an enterprise-oriented AI platform designed to combine intelligent know
 ## Repository Architecture
 
 - **`frontend/`**: React + TypeScript + Vite single-page application built with the ORVEX Pearl Enterprise Intelligence design system.
-- **`backend/`**: Python + FastAPI RESTful backend service foundation providing configuration, CORS, error handling, health endpoints, and automated tests.
-- **`docs/`**: Product specifications, requirements, and architecture documentation.
+- **`backend/`**: Python 3.12 + FastAPI RESTful backend service with SQLAlchemy 2.x, asyncpg, Alembic migrations, and PostgreSQL 16 database foundation.
+- **`docs/`**: Specifications, requirements, and database architecture documentation (`docs/database-architecture.md`).
 
 ---
 
@@ -31,47 +31,50 @@ Useful scripts:
 - `npm run lint`: Code quality linting via Oxlint
 - `npm run preview`: Preview production build bundle
 
-### 2. Backend Setup
+### 2. Backend & Database Setup
 
-Requirements: Python 3.12+.
+Requirements: Python 3.12+, Docker & Docker Compose (for local PostgreSQL 16).
 
+#### Step 1: Start Local PostgreSQL 16 Container
+```bash
+# Run from repository root:
+docker compose up -d
+```
+
+#### Step 2: Create & Activate Virtual Environment
 ```bash
 cd backend
 python -m venv .venv
 ```
-
-Activate environment:
 - **Windows (PowerShell)**: `\.venv\Scripts\Activate.ps1`
 - **macOS / Linux**: `source .venv/bin/activate`
 
-Install dependencies and start dev server:
-
+#### Step 3: Install Dependencies & Configure Environment
 ```bash
 pip install -r requirements.txt
 cp .env.example .env
+```
+
+#### Step 4: Run Alembic Database Migrations
+```bash
+alembic upgrade head
+```
+
+#### Step 5: Start FastAPI Server
+```bash
 uvicorn app.main:app --reload --port 8000
 ```
 
 Backend URLs:
 - API Base: `http://localhost:8000/api/v1`
-- Health Endpoint: `http://localhost:8000/api/v1/health`
+- Service Health: `http://localhost:8000/api/v1/health`
+- Database Health: `http://localhost:8000/api/v1/health/db`
 - Interactive OpenAPI Docs: `http://localhost:8000/api/v1/docs`
 
-Run backend test suite:
-
+#### Step 6: Run Test Suite
 ```bash
-pytest
+pytest -v
 ```
-
----
-
-## Core Capabilities & Vision
-
-- AI Assistant & Retrieval-Augmented Generation (RAG)
-- AI Agents & Graph Workflows
-- Document Intelligence & Search
-- Data Analytics & Telemetry
-- Role-Based Access Control (RBAC) & Enterprise Security
 
 ---
 
@@ -79,5 +82,5 @@ pytest
 
 - **Frontend**: React 19, TypeScript, Vite 8, Lucide React, Vanilla CSS
 - **Backend**: Python 3.12, FastAPI, Uvicorn, Pydantic v2, Pytest
-- **Database (Planned)**: PostgreSQL
+- **Database**: PostgreSQL 16, SQLAlchemy 2.x, asyncpg, Alembic
 - **AI Engine (Planned)**: LLM Orchestration, Embeddings, Vector Search

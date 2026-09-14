@@ -17,3 +17,12 @@ class HealthResponse(BaseModel):
             }
         }
     }
+
+
+class DatabaseHealthResponse(BaseModel):
+    """Response schema for Database health check endpoint."""
+
+    status: str = Field(default="ok", description="Database connectivity status ('ok' or 'error')")
+    database: str = Field(default="PostgreSQL", description="Database engine name")
+    connected: bool = Field(default=True, description="Boolean flag indicating database connection success")
+    details: str | None = Field(default=None, description="Optional detail message")

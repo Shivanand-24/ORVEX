@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: orvex_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: orvex_db
+      POSTGRES_USER: orvex_user
+      POSTGRES_PASSWORD: orvex_dev_secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - orvex_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U orvex_user -d orvex_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  orvex_pg_data:
+    name: orvex_pg_data

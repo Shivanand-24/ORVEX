@@ -13,6 +13,10 @@ class Settings(BaseSettings):
     CORS_ORIGINS: Union[List[str], str] = ["http://localhost:5173"]
     LOG_LEVEL: str = "INFO"
 
+    # Database Configuration (PostgreSQL 16)
+    DATABASE_URL: str = "postgresql+asyncpg://orvex_user:orvex_dev_secret@localhost:5432/orvex_db"
+    SYNC_DATABASE_URL: str = "postgresql+psycopg2://orvex_user:orvex_dev_secret@localhost:5432/orvex_db"
+
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
     def parse_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:
