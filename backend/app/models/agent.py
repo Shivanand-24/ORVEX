@@ -1,6 +1,6 @@
 import uuid
 from typing import List, TYPE_CHECKING
-from sqlalchemy import Boolean, ForeignKey, String, Text, text
+from sqlalchemy import Boolean, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -54,7 +54,6 @@ class Agent(Base, TimestampMixin):
         UUID(as_uuid=True),
         primary_key=True,
         default=uuid.uuid4,
-        server_default=text("gen_random_uuid()"),
     )
     organization_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
@@ -71,11 +70,11 @@ class Agent(Base, TimestampMixin):
     description: Mapped[str] = mapped_column(Text, nullable=False)
     domain: Mapped[str] = mapped_column(String(100), nullable=False)
     status: Mapped[str] = mapped_column(
-        String(20), nullable=False, default="Active", server_default=text("'Active'")
+        String(20), nullable=False, default="Active"
     )
     system_instructions: Mapped[str] = mapped_column(Text, nullable=False)
     require_approval: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=False, server_default=text("false")
+        Boolean, nullable=False, default=False
     )
 
     # Relationships

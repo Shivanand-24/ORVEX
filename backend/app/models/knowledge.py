@@ -1,6 +1,6 @@
 import uuid
 from typing import List, TYPE_CHECKING
-from sqlalchemy import BigInteger, ForeignKey, Index, String, Text, text
+from sqlalchemy import BigInteger, ForeignKey, Index, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -19,7 +19,6 @@ class KnowledgeSource(Base, TimestampMixin):
         UUID(as_uuid=True),
         primary_key=True,
         default=uuid.uuid4,
-        server_default=text("gen_random_uuid()"),
     )
     organization_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
@@ -46,7 +45,6 @@ class KnowledgeDocument(Base, TimestampMixin):
         UUID(as_uuid=True),
         primary_key=True,
         default=uuid.uuid4,
-        server_default=text("gen_random_uuid()"),
     )
     organization_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
@@ -65,10 +63,10 @@ class KnowledgeDocument(Base, TimestampMixin):
     storage_path: Mapped[str] = mapped_column(String(512), nullable=False)
     size_bytes: Mapped[int] = mapped_column(BigInteger, nullable=False)
     processing_status: Mapped[str] = mapped_column(
-        String(50), nullable=False, default="pending", server_default=text("'pending'")
+        String(50), nullable=False, default="pending"
     )
     indexing_status: Mapped[str] = mapped_column(
-        String(50), nullable=False, default="not_indexed", server_default=text("'not_indexed'")
+        String(50), nullable=False, default="not_indexed"
     )
     summary: Mapped[str | None] = mapped_column(Text, nullable=True)
 

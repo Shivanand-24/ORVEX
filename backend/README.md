@@ -49,17 +49,36 @@ backend/
 │   │   ├── workflow.py     # Workflow, WorkflowStep & WorkflowExecution
 │   │   └── audit.py        # AuditLog
 │   │
-│   ├── api/v1/            # API endpoints
+│   ├── repositories/      # Data access layer (AsyncSession CRUD)
+│   │   ├── organization_repository.py
+│   │   ├── user_repository.py
+│   │   └── membership_repository.py
+│   │
+│   ├── services/          # Business logic layer
+│   │   ├── organization_service.py
+│   │   ├── user_service.py
+│   │   └── membership_service.py
+│   │
+│   ├── api/v1/            # API endpoints & routers
 │   │   ├── router.py      # Master v1 router
-│   │   └── health.py      # Service & DB health check endpoints
+│   │   ├── health.py      # Health check endpoints
+│   │   ├── organizations.py # Organization CRUD router
+│   │   ├── users.py         # User CRUD router
+│   │   └── memberships.py   # Organization Membership router
 │   │
 │   └── schemas/           # Pydantic request/response schemas
-│       └── health.py
+│       ├── health.py
+│       ├── organization.py
+│       ├── user.py
+│       └── membership.py
 │
 ├── tests/                 # Pytest suite
 │   ├── test_health.py
 │   ├── test_db_models.py
-│   └── test_db_health.py
+│   ├── test_db_health.py
+│   ├── test_organizations_api.py
+│   ├── test_users_api.py
+│   └── test_memberships_api.py
 │
 ├── alembic.ini            # Alembic configuration
 ├── .env.example           # Environment template configuration
@@ -132,6 +151,54 @@ alembic upgrade head
 
 ---
 
+## Data Access Layer APIs & Payloads (Phase 2B)
+
+### Organizations API (`/api/v1/organizations`)
+
+- `POST /api/v1/organizations`: Create new organization (requires `name` and unique `slug`).
+- `GET /api/v1/organizations`: List all organizations.
+- `GET /api/v1/organizations/{id}`: Get organization by UUID.
+- `PATCH /api/v1/organizations/{id}`: Update organization `name` or `slug`.
+
+**Example Create Request:**
+```json
+{
+  "name": "Acme Intelligence Corp",
+  "slug": "acme-corp"
+}
+```
+
+### Users API (`/api/v1/users`)
+
+- `POST /api/v1/users`: Create new global user identity (requires valid, unique `email` and `full_name`).
+- `GET /api/v1/users`: List all users.
+- `GET /api/v1/users/{id}`: Get user by UUID.
+
+**Example Create Request:**
+```json
+{
+  "email": "alice@acme.com",
+  "full_name": "Alice Smith"
+}
+```
+
+### Memberships API (`/api/v1/organizations/{organization_id}/members`)
+
+- `POST /api/v1/organizations/{organization_id}/members`: Add user to organization with role (`admin`, `member`, or `analyst`).
+- `GET /api/v1/organizations/{organization_id}/members`: List all members of an organization.
+- `PATCH /api/v1/organizations/{organization_id}/members/{membership_id}`: Update member role.
+- `DELETE /api/v1/organizations/{organization_id}/members/{membership_id}`: Remove member from organization (preserves User and Organization entities).
+
+**Example Add Member Request:**
+```json
+{
+  "user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "role": "admin"
+}
+```
+
+---
+
 ## Running Development Server & Tests
 
 ### Start FastAPI Server
@@ -148,9 +215,19 @@ Endpoints:
 
 ### Run Test Suite
 
+The test suite runs using in-memory SQLite (`aiosqlite`) and does not require a running PostgreSQL server:
+
 ```bash
 pytest -v
 ```
+
+All 34 backend unit and API integration tests cover:
+- FastAPI router, service, and repository layers
+- Domain validation (emails, slugs, valid roles)
+- Conflict detection (duplicate slugs, duplicate emails, duplicate org memberships)
+- Entity not found handling (404 response codes)
+- Strict cross-organization access control & membership isolation
+- CASCADE & preservation behavior on deletion
 
 ---
 
@@ -172,3 +249,4 @@ pytest -v
 | `workflow_steps` | UUID | `workflow_id` (FK CASCADE), `config` (JSONB), `next_step_ids` (JSONB) |
 | `workflow_executions` | UUID | `workflow_id` (FK CASCADE), `execution_log` (JSONB) |
 | `audit_logs` | UUID | `organization_id` (FK CASCADE), `actor_id` (FK SET NULL), `details` (JSONB) |
+

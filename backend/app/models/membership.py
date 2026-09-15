@@ -1,6 +1,6 @@
 import uuid
 from typing import TYPE_CHECKING
-from sqlalchemy import CheckConstraint, ForeignKey, String, UniqueConstraint, text
+from sqlalchemy import CheckConstraint, ForeignKey, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -20,7 +20,6 @@ class OrganizationMembership(Base, TimestampMixin):
         UUID(as_uuid=True),
         primary_key=True,
         default=uuid.uuid4,
-        server_default=text("gen_random_uuid()"),
     )
     organization_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
@@ -37,7 +36,6 @@ class OrganizationMembership(Base, TimestampMixin):
         String(50),
         nullable=False,
         default="member",
-        server_default=text("'member'"),
     )
 
     # Table constraints

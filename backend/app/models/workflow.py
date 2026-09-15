@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 from typing import List, TYPE_CHECKING
-from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, Text, text
+from sqlalchemy import DateTime, ForeignKey, Index, Integer, JSON, String, Text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -10,6 +10,9 @@ from app.models.base import Base, TimestampMixin
 if TYPE_CHECKING:
     from app.models.organization import Organization
     from app.models.user import User
+
+# Dialect-agnostic JSON type that compiles as JSONB on PostgreSQL and JSON on SQLite
+JSONType = JSON().with_variant(JSONB, "postgresql")
 
 
 class Workflow(Base, TimestampMixin):
@@ -21,7 +24,6 @@ class Workflow(Base, TimestampMixin):
         UUID(as_uuid=True),
         primary_key=True,
         default=uuid.uuid4,
-        server_default=text("gen_random_uuid()"),
     )
     organization_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
@@ -37,7 +39,7 @@ class Workflow(Base, TimestampMixin):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
     status: Mapped[str] = mapped_column(
-        String(20), nullable=False, default="Draft", server_default=text("'Draft'")
+        String(20), nullable=False, default="Draft"
     )
     trigger_type: Mapped[str] = mapped_column(String(100), nullable=False)
 
@@ -61,7 +63,6 @@ class WorkflowStep(Base, TimestampMixin):
         UUID(as_uuid=True),
         primary_key=True,
         default=uuid.uuid4,
-        server_default=text("gen_random_uuid()"),
     )
     workflow_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
@@ -74,10 +75,10 @@ class WorkflowStep(Base, TimestampMixin):
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     config: Mapped[dict] = mapped_column(
-        JSONB, nullable=False, default=dict, server_default=text("'{}'::jsonb")
+        JSONType, nullable=False, default=dict
     )
     next_step_ids: Mapped[list] = mapped_column(
-        JSONB, nullable=False, default=list, server_default=text("'[]'::jsonb")
+        JSONType, nullable=False, default=list
     )
 
     # Relationships
@@ -93,7 +94,6 @@ class WorkflowExecution(Base):
         UUID(as_uuid=True),
         primary_key=True,
         default=uuid.uuid4,
-        server_default=text("gen_random_uuid()"),
     )
     workflow_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
@@ -107,20 +107,19 @@ class WorkflowExecution(Base):
         nullable=True,
     )
     status: Mapped[str] = mapped_column(
-        String(50), nullable=False, default="running", server_default=text("'running'")
+        String(50), nullable=False, default="running"
     )
     started_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
         default=lambda: datetime.now(timezone.utc),
-        server_default=text("NOW()"),
     )
     completed_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True),
         nullable=True,
     )
     execution_log: Mapped[list] = mapped_column(
-        JSONB, nullable=False, default=list, server_default=text("'[]'::jsonb")
+        JSONType, nullable=False, default=list
     )
 
     # Table indexes
