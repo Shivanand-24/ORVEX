@@ -52,25 +52,31 @@ backend/
 │   ├── repositories/      # Data access layer (AsyncSession CRUD)
 │   │   ├── organization_repository.py
 │   │   ├── user_repository.py
-│   │   └── membership_repository.py
+│   │   ├── membership_repository.py
+│   │   ├── knowledge_source_repository.py
+│   │   └── knowledge_document_repository.py
 │   │
 │   ├── services/          # Business logic layer
 │   │   ├── organization_service.py
 │   │   ├── user_service.py
-│   │   └── membership_service.py
+│   │   ├── membership_service.py
+│   │   ├── knowledge_source_service.py
+│   │   └── knowledge_document_service.py
 │   │
 │   ├── api/v1/            # API endpoints & routers
 │   │   ├── router.py      # Master v1 router
 │   │   ├── health.py      # Health check endpoints
 │   │   ├── organizations.py # Organization CRUD router
 │   │   ├── users.py         # User CRUD router
-│   │   └── memberships.py   # Organization Membership router
+│   │   ├── memberships.py   # Organization Membership router
+│   │   └── knowledge.py     # Knowledge Sources & Documents router
 │   │
 │   └── schemas/           # Pydantic request/response schemas
 │       ├── health.py
 │       ├── organization.py
 │       ├── user.py
-│       └── membership.py
+│       ├── membership.py
+│       └── knowledge.py
 │
 ├── tests/                 # Pytest suite
 │   ├── test_health.py
@@ -78,7 +84,9 @@ backend/
 │   ├── test_db_health.py
 │   ├── test_organizations_api.py
 │   ├── test_users_api.py
-│   └── test_memberships_api.py
+│   ├── test_memberships_api.py
+│   ├── test_knowledge_sources_api.py
+│   └── test_knowledge_documents_api.py
 │
 ├── alembic.ini            # Alembic configuration
 ├── .env.example           # Environment template configuration
@@ -197,6 +205,50 @@ alembic upgrade head
 }
 ```
 
+### Knowledge Sources API (`/api/v1/knowledge/sources`) (Phase 2C)
+
+- `POST /api/v1/knowledge/sources`: Create new knowledge source collection for an organization.
+- `GET /api/v1/knowledge/sources`: List knowledge sources, optionally filtered by `organization_id`.
+- `GET /api/v1/knowledge/sources/{source_id}`: Retrieve knowledge source by UUID (with optional `organization_id` tenant isolation).
+- `PATCH /api/v1/knowledge/sources/{source_id}`: Update collection `name` or `description`.
+- `DELETE /api/v1/knowledge/sources/{source_id}`: Delete collection (cascades delete to all attached documents).
+
+**Example Create Request:**
+```json
+{
+  "organization_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "name": "Engineering Runbooks",
+  "description": "Troubleshooting guides and system operational procedures."
+}
+```
+
+### Knowledge Documents API (`/api/v1/knowledge/...`) (Phase 2C)
+
+- `POST /api/v1/knowledge/sources/{source_id}/documents`: Create document metadata under a knowledge source.
+- `GET /api/v1/knowledge/sources/{source_id}/documents`: List all documents belonging to a knowledge source.
+- `GET /api/v1/knowledge/documents/{document_id}`: Retrieve a single knowledge document by UUID.
+- `PATCH /api/v1/knowledge/documents/{document_id}`: Update document metadata or lifecycle status.
+- `DELETE /api/v1/knowledge/documents/{document_id}`: Delete a knowledge document (parent source remains intact).
+
+**Example Create Request:**
+```json
+{
+  "name": "Architecture Overview 2026.pdf",
+  "file_type": "PDF",
+  "size_bytes": 1048576,
+  "summary": "Technical system architecture overview.",
+  "status": "Pending",
+  "readiness": "NotIndexed"
+}
+```
+
+#### Knowledge Lifecycle & Multi-Tenant Isolation
+- **Processing Statuses:** `pending`, `processing`, `processed`, `failed` (Frontend: `Pending`, `Processing`, `Processed`, `Failed`).
+- **Indexing Readiness:** `not_indexed`, `indexing`, `indexed`, `index_failed` (Frontend: `NotIndexed`, `Indexing`, `Indexed`, `IndexFailed`).
+- **Lifecycle Rule:** Document must reach `processed` state before transitioning readiness to `indexing` or `indexed`.
+- **Tenant Isolation:** Cross-organization source queries, document lookups, and cross-tenant document attachments are strictly rejected with 404/400 errors.
+- **Current Limitation:** Because authentication is deferred to later milestones, `organization_id` is supplied explicitly at the API boundary.
+
 ---
 
 ## Running Development Server & Tests
@@ -221,12 +273,12 @@ The test suite runs using in-memory SQLite (`aiosqlite`) and does not require a 
 pytest -v
 ```
 
-All 34 backend unit and API integration tests cover:
-- FastAPI router, service, and repository layers
-- Domain validation (emails, slugs, valid roles)
+All 55 backend unit and API integration tests cover:
+- FastAPI router, service, and repository layers for Organizations, Users, Memberships, Knowledge Sources, and Knowledge Documents
+- Domain validation (emails, slugs, valid roles, lifecycle state transitions)
 - Conflict detection (duplicate slugs, duplicate emails, duplicate org memberships)
 - Entity not found handling (404 response codes)
-- Strict cross-organization access control & membership isolation
+- Strict cross-organization access control & tenant isolation
 - CASCADE & preservation behavior on deletion
 
 ---

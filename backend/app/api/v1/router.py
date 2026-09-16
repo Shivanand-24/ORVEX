@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1 import health, memberships, organizations, users
+from app.api.v1 import health, knowledge, memberships, organizations, users
 
 api_router = APIRouter()
 
@@ -14,3 +14,4 @@ api_router.include_router(
     prefix="/organizations/{organization_id}/members",
     tags=["Memberships"],
 )
+api_router.include_router(knowledge.router, prefix="/knowledge", tags=["Knowledge"])
