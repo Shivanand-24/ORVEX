@@ -87,6 +87,27 @@ export interface ApiAssistantMessage {
   created_at: string;
 }
 
+export interface ApiAgent {
+  id: string;
+  organization_id: string;
+  created_by_user_id: string;
+  name: string;
+  description: string;
+  domain: string;
+  status: 'Active' | 'Paused' | string;
+  system_instructions: string;
+  require_approval: boolean;
+  tools: string[];
+  knowledge_source_ids: string[];
+  owner?: string | null;
+  created_at: string;
+  updated_at: string;
+  executions?: number;
+  success_rate?: string;
+  last_run?: string;
+}
+
+
 export const apiClient = {
   baseUrl: API_BASE_URL,
 
@@ -379,4 +400,120 @@ export const apiClient = {
     apiClient.assistant.messages.list(conversationId, params),
   getMessage: (messageId: string, params?: { organization_id?: string }) =>
     apiClient.assistant.messages.get(messageId, params),
+
+  // Agents API
+  agents: {
+    list: (params?: {
+      organization_id?: string;
+      domain?: string;
+      status?: string;
+      skip?: number;
+      limit?: number;
+    }) => {
+      const query = new URLSearchParams();
+      if (params?.organization_id) query.append('organization_id', params.organization_id);
+      if (params?.domain) query.append('domain', params.domain);
+      if (params?.status) query.append('status', params.status);
+      if (params?.skip !== undefined) query.append('skip', String(params.skip));
+      if (params?.limit !== undefined) query.append('limit', String(params.limit));
+      const qs = query.toString();
+      return apiClient.get<ApiAgent[]>(qs ? `/agents?${qs}` : '/agents');
+    },
+    get: (id: string, params?: { organization_id?: string }) => {
+      const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
+      return apiClient.get<ApiAgent>(`/agents/${id}${qs}`);
+    },
+    create: (data: {
+      organization_id: string;
+      created_by_user_id?: string;
+      name: string;
+      description: string;
+      domain?: string;
+      status?: string;
+      system_instructions: string;
+      require_approval?: boolean;
+      tools?: string[];
+      knowledge_source_ids?: string[];
+    }) => apiClient.post<ApiAgent>('/agents', data),
+    update: (
+      id: string,
+      data: {
+        name?: string;
+        description?: string;
+        domain?: string;
+        status?: string;
+        system_instructions?: string;
+        require_approval?: boolean;
+      },
+      params?: { organization_id?: string }
+    ) => {
+      const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
+      return apiClient.patch<ApiAgent>(`/agents/${id}${qs}`, data);
+    },
+    delete: (id: string, params?: { organization_id?: string }) => {
+      const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
+      return apiClient.delete(`/agents/${id}${qs}`);
+    },
+    listKnowledgeSources: (agentId: string, params?: { organization_id?: string }) => {
+      const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
+      return apiClient.get<ApiKnowledgeSource[]>(`/agents/${agentId}/knowledge-sources${qs}`);
+    },
+    attachKnowledgeSource: (agentId: string, sourceId: string, params?: { organization_id?: string }) => {
+      const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
+      return apiClient.post<ApiKnowledgeSource>(`/agents/${agentId}/knowledge-sources${qs}`, { source_id: sourceId });
+    },
+    detachKnowledgeSource: (agentId: string, sourceId: string, params?: { organization_id?: string }) => {
+      const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
+      return apiClient.delete(`/agents/${agentId}/knowledge-sources/${sourceId}${qs}`);
+    },
+    listTools: (agentId: string, params?: { organization_id?: string }) => {
+      const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
+      return apiClient.get<string[]>(`/agents/${agentId}/tools${qs}`);
+    },
+    attachTool: (agentId: string, toolName: string, params?: { organization_id?: string }) => {
+      const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
+      return apiClient.post<{ agent_id: string; tool_name: string }>(`/agents/${agentId}/tools${qs}`, { tool_name: toolName });
+    },
+    detachTool: (agentId: string, toolName: string, params?: { organization_id?: string }) => {
+      const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
+      return apiClient.delete(`/agents/${agentId}/tools/${encodeURIComponent(toolName)}${qs}`);
+    },
+  },
+
+  // Agents top-level convenience methods
+  createAgent: (data: {
+    organization_id: string;
+    created_by_user_id?: string;
+    name: string;
+    description: string;
+    domain?: string;
+    status?: string;
+    system_instructions: string;
+    require_approval?: boolean;
+    tools?: string[];
+    knowledge_source_ids?: string[];
+  }) => apiClient.agents.create(data),
+  getAgents: (params?: {
+    organization_id?: string;
+    domain?: string;
+    status?: string;
+    skip?: number;
+    limit?: number;
+  }) => apiClient.agents.list(params),
+  getAgent: (id: string, params?: { organization_id?: string }) =>
+    apiClient.agents.get(id, params),
+  updateAgent: (
+    id: string,
+    data: {
+      name?: string;
+      description?: string;
+      domain?: string;
+      status?: string;
+      system_instructions?: string;
+      require_approval?: boolean;
+    },
+    params?: { organization_id?: string }
+  ) => apiClient.agents.update(id, data, params),
+  deleteAgent: (id: string, params?: { organization_id?: string }) =>
+    apiClient.agents.delete(id, params),
 };

@@ -30,7 +30,7 @@ class AssistantConversationService:
                 raise NotFoundError(f"User with ID '{user_id}' not found.")
         else:
             # Fallback to first member of organization
-            members = await membership_repository.list_by_org(db, schema.organization_id, limit=1)
+            members = await membership_repository.list_by_organization(db, schema.organization_id, limit=1)
             if members:
                 user_id = members[0].user_id
             else:

@@ -56,7 +56,8 @@ backend/
 │   │   ├── knowledge_source_repository.py
 │   │   ├── knowledge_document_repository.py
 │   │   ├── conversation_repository.py
-│   │   └── message_repository.py
+│   │   ├── message_repository.py
+│   │   └── agent_repository.py
 │   │
 │   ├── services/          # Business logic layer
 │   │   ├── organization_service.py
@@ -65,7 +66,8 @@ backend/
 │   │   ├── knowledge_source_service.py
 │   │   ├── knowledge_document_service.py
 │   │   ├── assistant_conversation_service.py
-│   │   └── assistant_message_service.py
+│   │   ├── assistant_message_service.py
+│   │   └── agent_service.py
 │   │
 │   ├── api/v1/            # API endpoints & routers
 │   │   ├── router.py      # Master v1 router
@@ -74,7 +76,8 @@ backend/
 │   │   ├── users.py         # User CRUD router
 │   │   ├── memberships.py   # Organization Membership router
 │   │   ├── knowledge.py     # Knowledge Sources & Documents router
-│   │   └── assistant.py     # Assistant Conversations & Messages router
+│   │   ├── assistant.py     # Assistant Conversations & Messages router
+│   │   └── agents.py        # Agents & Relationships router
 │   │
 │   └── schemas/           # Pydantic request/response schemas
 │       ├── health.py
@@ -82,7 +85,8 @@ backend/
 │       ├── user.py
 │       ├── membership.py
 │       ├── knowledge.py
-│       └── assistant.py
+│       ├── assistant.py
+│       └── agent.py
 │
 ├── tests/                 # Pytest suite
 │   ├── test_health.py
@@ -93,7 +97,8 @@ backend/
 │   ├── test_memberships_api.py
 │   ├── test_knowledge_sources_api.py
 │   ├── test_knowledge_documents_api.py
-│   └── test_assistant_api.py
+│   ├── test_assistant_api.py
+│   └── test_agent_api.py
 │
 ├── alembic.ini            # Alembic configuration
 ├── .env.example           # Environment template configuration
@@ -296,6 +301,45 @@ alembic upgrade head
 - **Tenant Isolation:** Cross-organization conversation queries, message listings, message retrieval, and message postings return `404 Not Found`.
 - **Current Limitation (Persistence First):** Messages are persisted reliably in the database; real AI/LLM response generation, streaming, and RAG execution will be attached in subsequent milestones.
 
+### Agents API (`/api/v1/agents/...`) (Phase 2E)
+
+#### Agents CRUD (`/api/v1/agents`)
+- `POST /api/v1/agents`: Register and configure a new AI Agent for an organization (with optional initial tools and knowledge sources).
+- `GET /api/v1/agents`: List AI agents with filtering by `organization_id`, `domain`, `status`, and pagination (`skip`, `limit`).
+- `GET /api/v1/agents/{agent_id}`: Retrieve agent details by UUID (with optional `organization_id` tenant check).
+- `PATCH /api/v1/agents/{agent_id}`: Update agent fields (`name`, `description`, `domain`, `status`, `system_instructions`, `require_approval`).
+- `DELETE /api/v1/agents/{agent_id}`: Delete an agent (cascades deletion to attached tools and knowledge source associations).
+
+**Example Create Request:**
+```json
+{
+  "organization_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "name": "Research Sentinel",
+  "description": "Autonomous research and document synthesis worker.",
+  "domain": "Research",
+  "status": "Active",
+  "system_instructions": "Analyze documents and pull relevant knowledge citations.",
+  "require_approval": false,
+  "tools": ["Document Parser", "RAG Retrieval"],
+  "knowledge_source_ids": ["7d2b4510-37cb-4b36-a36c-941e3d3fa1cf"]
+}
+```
+
+#### Relationships (`/api/v1/agents/{agent_id}/...`)
+- `GET /api/v1/agents/{agent_id}/knowledge-sources`: List knowledge sources attached to this agent.
+- `POST /api/v1/agents/{agent_id}/knowledge-sources`: Attach a knowledge source (`source_id: UUID`) to this agent.
+- `DELETE /api/v1/agents/{agent_id}/knowledge-sources/{source_id}`: Detach a knowledge source from this agent.
+- `GET /api/v1/agents/{agent_id}/tools`: List tool names attached to this agent.
+- `POST /api/v1/agents/{agent_id}/tools`: Attach a tool identifier (`tool_name: str`) to this agent.
+- `DELETE /api/v1/agents/{agent_id}/tools/{tool_name}`: Detach a tool identifier from this agent.
+
+#### Agent Persistence & Multi-Tenant Isolation
+- **Organization Boundary:** Every agent belongs to exactly one organization.
+- **Creator User Resolution:** Requires `created_by_user_id` (safely falls back to an organization member if omitted).
+- **Cross-Tenant Knowledge Source Protection:** Attempting to attach a KnowledgeSource from a different organization is strictly rejected with `404 Not Found`.
+- **Eager Loading Performance:** Repositories use `selectinload` for `tools`, `knowledge_sources`, and `creator` to eliminate N+1 query overhead.
+- **Current Limitation (Management Only):** This milestone establishes database persistence for Agents and their associations. Runtime execution loops, LLM calls, tool execution, and RAG retrieval will be connected in future milestones.
+
 ---
 
 ## Running Development Server & Tests
@@ -320,13 +364,14 @@ The test suite runs using in-memory SQLite (`aiosqlite`) and does not require a 
 pytest -v
 ```
 
-All 75 backend unit and API integration tests cover:
-- FastAPI router, service, and repository layers for Organizations, Users, Memberships, Knowledge, and Assistant
-- Domain validation (emails, slugs, valid roles, lifecycle state transitions)
+All 95 backend unit and API integration tests cover:
+- FastAPI router, service, and repository layers for Organizations, Users, Memberships, Knowledge, Assistant, and Agents
+- Domain validation (emails, slugs, valid roles, agent domains, valid statuses, lifecycle state transitions)
 - Conflict detection (duplicate slugs, duplicate emails, duplicate org memberships)
 - Entity not found handling (404 response codes)
 - Strict cross-organization access control & tenant isolation
 - CASCADE & preservation behavior on deletion
+
 
 ---
 
