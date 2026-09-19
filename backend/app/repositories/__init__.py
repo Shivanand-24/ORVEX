@@ -8,6 +8,7 @@ from app.repositories.knowledge_document_repository import knowledge_document_re
 from app.repositories.conversation_repository import conversation_repository
 from app.repositories.message_repository import message_repository
 from app.repositories.agent_repository import agent_repository, AgentRepository
+from app.repositories.agent_execution_repository import agent_execution_repository, AgentExecutionRepository
 
 __all__ = [
     "organization_repository",
@@ -19,4 +20,6 @@ __all__ = [
     "message_repository",
     "agent_repository",
     "AgentRepository",
+    "agent_execution_repository",
+    "AgentExecutionRepository",
 ]

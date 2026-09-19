@@ -22,7 +22,8 @@ The ORVEX backend is a high-performance RESTful API service built with **Python 
 backend/
 ├── alembic/               # Alembic database migrations
 │   ├── versions/
-│   │   └── 0001_initial_schema.py
+│   │   ├── 0001_initial_schema.py
+│   │   └── 0002_agent_executions.py
 │   ├── env.py
 │   └── script.py.mako
 │
@@ -38,7 +39,14 @@ backend/
 │   │   ├── base.py        # Base metadata & model export
 │   │   └── session.py     # AsyncSessionLocal & get_db_session dependency
 │   │
-│   ├── models/            # SQLAlchemy 2.x declarative models (14 tables)
+│   ├── execution/         # Agent execution foundation primitives
+│   │   ├── lifecycle.py   # State machine, ExecutionStatus & transition validation
+│   │   ├── context.py     # Ephemeral runtime ExecutionContext
+│   │   ├── interfaces.py  # Provider contracts (KnowledgeProvider, ToolRegistry, LLMProvider)
+│   │   ├── resolver.py    # Agent configuration & tenant resolver
+│   │   └── approval.py    # Human-in-the-loop approval manager
+│   │
+│   ├── models/            # SQLAlchemy 2.x declarative models (15 tables)
 │   │   ├── base.py        # Base & TimestampMixin
 │   │   ├── organization.py # Organization
 │   │   ├── user.py         # User
@@ -46,6 +54,7 @@ backend/
 │   │   ├── knowledge.py    # KnowledgeSource & KnowledgeDocument
 │   │   ├── assistant.py    # Conversation & AssistantMessage
 │   │   ├── agent.py        # Agent, AgentKnowledgeSource & AgentTool
+│   │   ├── agent_execution.py # AgentExecution
 │   │   ├── workflow.py     # Workflow, WorkflowStep & WorkflowExecution
 │   │   └── audit.py        # AuditLog
 │   │
@@ -57,7 +66,8 @@ backend/
 │   │   ├── knowledge_document_repository.py
 │   │   ├── conversation_repository.py
 │   │   ├── message_repository.py
-│   │   └── agent_repository.py
+│   │   ├── agent_repository.py
+│   │   └── agent_execution_repository.py
 │   │
 │   ├── services/          # Business logic layer
 │   │   ├── organization_service.py
@@ -67,7 +77,8 @@ backend/
 │   │   ├── knowledge_document_service.py
 │   │   ├── assistant_conversation_service.py
 │   │   ├── assistant_message_service.py
-│   │   └── agent_service.py
+│   │   ├── agent_service.py
+│   │   └── agent_execution_service.py
 │   │
 │   ├── api/v1/            # API endpoints & routers
 │   │   ├── router.py      # Master v1 router
@@ -77,7 +88,8 @@ backend/
 │   │   ├── memberships.py   # Organization Membership router
 │   │   ├── knowledge.py     # Knowledge Sources & Documents router
 │   │   ├── assistant.py     # Assistant Conversations & Messages router
-│   │   └── agents.py        # Agents & Relationships router
+│   │   ├── agents.py        # Agents & Relationships router
+│   │   └── executions.py    # Agent Execution Lifecycle & Governance router
 │   │
 │   └── schemas/           # Pydantic request/response schemas
 │       ├── health.py
@@ -86,7 +98,8 @@ backend/
 │       ├── membership.py
 │       ├── knowledge.py
 │       ├── assistant.py
-│       └── agent.py
+│       ├── agent.py
+│       └── agent_execution.py
 │
 ├── tests/                 # Pytest suite
 │   ├── test_health.py
@@ -98,7 +111,8 @@ backend/
 │   ├── test_knowledge_sources_api.py
 │   ├── test_knowledge_documents_api.py
 │   ├── test_assistant_api.py
-│   └── test_agent_api.py
+│   ├── test_agent_api.py
+│   └── test_agent_execution.py
 │
 ├── alembic.ini            # Alembic configuration
 ├── .env.example           # Environment template configuration
@@ -333,12 +347,18 @@ alembic upgrade head
 - `POST /api/v1/agents/{agent_id}/tools`: Attach a tool identifier (`tool_name: str`) to this agent.
 - `DELETE /api/v1/agents/{agent_id}/tools/{tool_name}`: Detach a tool identifier from this agent.
 
-#### Agent Persistence & Multi-Tenant Isolation
-- **Organization Boundary:** Every agent belongs to exactly one organization.
-- **Creator User Resolution:** Requires `created_by_user_id` (safely falls back to an organization member if omitted).
-- **Cross-Tenant Knowledge Source Protection:** Attempting to attach a KnowledgeSource from a different organization is strictly rejected with `404 Not Found`.
-- **Eager Loading Performance:** Repositories use `selectinload` for `tools`, `knowledge_sources`, and `creator` to eliminate N+1 query overhead.
-- **Current Limitation (Management Only):** This milestone establishes database persistence for Agents and their associations. Runtime execution loops, LLM calls, tool execution, and RAG retrieval will be connected in future milestones.
+#### Agent Execution Foundation (`/api/v1/...`)
+- `POST /api/v1/agents/{agent_id}/executions`: Trigger an execution run for an active agent.
+- `GET /api/v1/agents/{agent_id}/executions`: List executions for an agent (with optional status filtering & pagination).
+- `GET /api/v1/executions/{execution_id}`: Retrieve detailed execution state, output, and telemetry metrics.
+- `POST /api/v1/executions/{execution_id}/approve`: Grant human approval to a run paused in `waiting_for_approval`.
+- `POST /api/v1/executions/{execution_id}/cancel`: Cancel a pending or running execution run.
+
+#### Execution Governance & Multi-Tenant Isolation
+- **Domain Lifecycle States:** Enforced strict state transitions (`pending`, `running`, `waiting_for_approval`, `completed`, `failed`, `cancelled`).
+- **Human-in-the-Loop Approval:** When `Agent.require_approval=True`, executions pause in `waiting_for_approval`. Only members of the owning organization can approve runs.
+- **Audit Logging:** Every state transition automatically emits privacy-safe metadata audit logs (`agent.execution.*`) without leaking raw user prompts or confidential model outputs.
+- **Cascade Deletion:** Deleting an Agent cleanly cascades and removes all associated execution runs.
 
 ---
 
@@ -364,18 +384,17 @@ The test suite runs using in-memory SQLite (`aiosqlite`) and does not require a 
 pytest -v
 ```
 
-All 95 backend unit and API integration tests cover:
-- FastAPI router, service, and repository layers for Organizations, Users, Memberships, Knowledge, Assistant, and Agents
+All 121 backend unit and API integration tests cover:
+- FastAPI router, service, and repository layers for Organizations, Users, Memberships, Knowledge, Assistant, Agents, and Executions
 - Domain validation (emails, slugs, valid roles, agent domains, valid statuses, lifecycle state transitions)
 - Conflict detection (duplicate slugs, duplicate emails, duplicate org memberships)
 - Entity not found handling (404 response codes)
 - Strict cross-organization access control & tenant isolation
 - CASCADE & preservation behavior on deletion
 
-
 ---
 
-## Database Architecture (14 Tables)
+## Database Architecture (15 Tables)
 
 | Entity Table | Primary Key | Key Columns / Constraints |
 | :--- | :--- | :--- |
@@ -389,6 +408,7 @@ All 95 backend unit and API integration tests cover:
 | `agents` | UUID | `organization_id` (FK CASCADE), `created_by_user_id` (FK RESTRICT) |
 | `agent_knowledge_sources` | Composite `(agent_id, source_id)` | FK CASCADE |
 | `agent_tools` | Composite `(agent_id, tool_name)` | Application Tool Registry mapping |
+| `agent_executions` | UUID | `organization_id` (FK CASCADE), `agent_id` (FK CASCADE), status CHECK, source CHECK |
 | `workflows` | UUID | `organization_id` (FK CASCADE), `created_by_user_id` (FK RESTRICT) |
 | `workflow_steps` | UUID | `workflow_id` (FK CASCADE), `config` (JSONB), `next_step_ids` (JSONB) |
 | `workflow_executions` | UUID | `workflow_id` (FK CASCADE), `execution_log` (JSONB) |

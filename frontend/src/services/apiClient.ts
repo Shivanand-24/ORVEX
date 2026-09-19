@@ -107,8 +107,47 @@ export interface ApiAgent {
   last_run?: string;
 }
 
+export interface ApiAgentExecution {
+  id: string;
+  organization_id: string;
+  agent_id: string;
+  triggered_by_user_id?: string | null;
+  source: string;
+  source_reference_id?: string | null;
+  input_prompt: string;
+  status: 'pending' | 'running' | 'waiting_for_approval' | 'completed' | 'failed' | 'cancelled' | string;
+  require_approval: boolean;
+  approved_by_user_id?: string | null;
+  output_result?: string | null;
+  error_message?: string | null;
+  tokens_used: number;
+  latency_ms: number;
+  started_at: string;
+  completed_at?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ApiAgentExecutionCreate {
+  organization_id: string;
+  triggered_by_user_id?: string | null;
+  source?: string;
+  source_reference_id?: string | null;
+  input_prompt: string;
+}
+
+export interface ApiApprovalRequest {
+  user_id: string;
+}
+
+export interface ApiCancellationRequest {
+  user_id?: string | null;
+  reason?: string | null;
+}
+
 
 export const apiClient = {
+
   baseUrl: API_BASE_URL,
 
   async get<T>(endpoint: string, options?: RequestInit): Promise<T> {
@@ -516,4 +555,39 @@ export const apiClient = {
   ) => apiClient.agents.update(id, data, params),
   deleteAgent: (id: string, params?: { organization_id?: string }) =>
     apiClient.agents.delete(id, params),
+
+  // Executions API
+  executions: {
+    create: (agentId: string, data: ApiAgentExecutionCreate) =>
+      apiClient.post<ApiAgentExecution>(`/agents/${agentId}/executions`, data),
+    listByAgent: (
+      agentId: string,
+      params?: {
+        organization_id?: string;
+        status?: string;
+        skip?: number;
+        limit?: number;
+      }
+    ) => {
+      const searchParams = new URLSearchParams();
+      if (params?.organization_id) searchParams.append('organization_id', params.organization_id);
+      if (params?.status) searchParams.append('status', params.status);
+      if (params?.skip !== undefined) searchParams.append('skip', String(params.skip));
+      if (params?.limit !== undefined) searchParams.append('limit', String(params.limit));
+      const qs = searchParams.toString() ? `?${searchParams.toString()}` : '';
+      return apiClient.get<ApiAgentExecution[]>(`/agents/${agentId}/executions${qs}`);
+    },
+    get: (executionId: string, params?: { organization_id?: string }) => {
+      const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
+      return apiClient.get<ApiAgentExecution>(`/executions/${executionId}${qs}`);
+    },
+    approve: (executionId: string, data: ApiApprovalRequest, params?: { organization_id?: string }) => {
+      const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
+      return apiClient.post<ApiAgentExecution>(`/executions/${executionId}/approve${qs}`, data);
+    },
+    cancel: (executionId: string, data: ApiCancellationRequest, params?: { organization_id?: string }) => {
+      const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
+      return apiClient.post<ApiAgentExecution>(`/executions/${executionId}/cancel${qs}`, data);
+    },
+  },
 };

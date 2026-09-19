@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1 import agents, assistant, health, knowledge, memberships, organizations, users
+from app.api.v1 import agents, assistant, executions, health, knowledge, memberships, organizations, users
 
 api_router = APIRouter()
 
@@ -17,3 +17,4 @@ api_router.include_router(
 api_router.include_router(knowledge.router, prefix="/knowledge", tags=["Knowledge"])
 api_router.include_router(assistant.router, prefix="/assistant", tags=["Assistant"])
 api_router.include_router(agents.router, prefix="/agents", tags=["Agents"])
+api_router.include_router(executions.router, tags=["Executions"])

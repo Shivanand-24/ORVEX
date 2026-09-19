@@ -10,6 +10,8 @@ if TYPE_CHECKING:
     from app.models.organization import Organization
     from app.models.user import User
     from app.models.knowledge import KnowledgeSource
+    from app.models.agent_execution import AgentExecution
+
 
 
 class AgentKnowledgeSource(Base):
@@ -85,4 +87,7 @@ class Agent(Base, TimestampMixin):
     )
     tools: Mapped[List["AgentTool"]] = relationship(
         "AgentTool", cascade="all, delete-orphan"
+    )
+    executions: Mapped[List["AgentExecution"]] = relationship(
+        "AgentExecution", back_populates="agent", cascade="all, delete-orphan"
     )

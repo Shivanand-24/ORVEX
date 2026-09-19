@@ -12,6 +12,7 @@ from app.models import (
     Agent,
     AgentKnowledgeSource,
     AgentTool,
+    AgentExecution,
     Workflow,
     WorkflowStep,
     WorkflowExecution,
@@ -29,6 +30,7 @@ EXPECTED_TABLES = {
     "agents",
     "agent_knowledge_sources",
     "agent_tools",
+    "agent_executions",
     "workflows",
     "workflow_steps",
     "workflow_executions",
@@ -36,16 +38,17 @@ EXPECTED_TABLES = {
 }
 
 
-def test_all_14_tables_registered_in_metadata() -> None:
-    """Verify that exactly all 14 required tables are registered in SQLAlchemy metadata."""
+def test_all_15_tables_registered_in_metadata() -> None:
+    """Verify that exactly all 15 required tables are registered in SQLAlchemy metadata."""
     registered_tables = set(Base.metadata.tables.keys())
     assert registered_tables == EXPECTED_TABLES
-    assert len(registered_tables) == 14
+    assert len(registered_tables) == 15
 
 
 def test_table_count() -> None:
-    """Verify metadata contains exactly 14 tables."""
-    assert len(Base.metadata.tables) == 14
+    """Verify metadata contains exactly 15 tables."""
+    assert len(Base.metadata.tables) == 15
+
 
 
 def test_junction_tables_composite_primary_keys() -> None:
@@ -85,6 +88,7 @@ def test_timestamp_scoping_correctness() -> None:
         "knowledge_documents",
         "conversations",
         "agents",
+        "agent_executions",
         "workflows",
         "workflow_steps",
     ]
@@ -125,3 +129,13 @@ def test_jsonb_columns() -> None:
 
     audit = Base.metadata.tables["audit_logs"]
     assert "details" in audit.columns
+
+
+def test_agent_executions_constraints() -> None:
+    """Verify check constraints and relationships on agent_executions table."""
+    table = Base.metadata.tables["agent_executions"]
+    constraint_names = [c.name for c in table.constraints]
+    assert "chk_agent_execution_status" in constraint_names
+    assert "chk_agent_execution_source" in constraint_names
+    assert "started_at" in table.columns
+    assert "completed_at" in table.columns

@@ -8,6 +8,7 @@ from app.services.knowledge_document_service import knowledge_document_service
 from app.services.assistant_conversation_service import assistant_conversation_service
 from app.services.assistant_message_service import assistant_message_service
 from app.services.agent_service import agent_service, AgentService
+from app.services.agent_execution_service import agent_execution_service, AgentExecutionService
 
 __all__ = [
     "organization_service",
@@ -19,4 +20,6 @@ __all__ = [
     "assistant_message_service",
     "agent_service",
     "AgentService",
+    "agent_execution_service",
+    "AgentExecutionService",
 ]
