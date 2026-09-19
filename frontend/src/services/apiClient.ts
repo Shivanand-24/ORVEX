@@ -67,6 +67,26 @@ export interface ApiKnowledgeDocument {
   updated_at: string;
 }
 
+export interface ApiConversation {
+  id: string;
+  organization_id: string;
+  user_id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+  message_count?: number;
+}
+
+export interface ApiAssistantMessage {
+  id: string;
+  conversation_id: string;
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  tokens_used: number;
+  latency_ms: number;
+  created_at: string;
+}
+
 export const apiClient = {
   baseUrl: API_BASE_URL,
 
@@ -285,4 +305,78 @@ export const apiClient = {
     apiClient.knowledge.documents.update(documentId, data, params),
   deleteKnowledgeDocument: (documentId: string, params?: { organization_id?: string }) =>
     apiClient.knowledge.documents.delete(documentId, params),
+
+  // Assistant API
+  assistant: {
+    conversations: {
+      list: (params?: { organization_id?: string; skip?: number; limit?: number }) => {
+        const query = new URLSearchParams();
+        if (params?.organization_id) query.append('organization_id', params.organization_id);
+        if (params?.skip !== undefined) query.append('skip', String(params.skip));
+        if (params?.limit !== undefined) query.append('limit', String(params.limit));
+        const qs = query.toString();
+        return apiClient.get<ApiConversation[]>(qs ? `/assistant/conversations?${qs}` : '/assistant/conversations');
+      },
+      get: (id: string, params?: { organization_id?: string }) => {
+        const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
+        return apiClient.get<ApiConversation>(`/assistant/conversations/${id}${qs}`);
+      },
+      create: (data: { organization_id: string; user_id?: string; title?: string }) =>
+        apiClient.post<ApiConversation>('/assistant/conversations', data),
+      update: (id: string, data: { title?: string }, params?: { organization_id?: string }) => {
+        const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
+        return apiClient.patch<ApiConversation>(`/assistant/conversations/${id}${qs}`, data);
+      },
+      delete: (id: string, params?: { organization_id?: string }) => {
+        const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
+        return apiClient.delete(`/assistant/conversations/${id}${qs}`);
+      },
+    },
+    messages: {
+      list: (conversationId: string, params?: { organization_id?: string; skip?: number; limit?: number }) => {
+        const query = new URLSearchParams();
+        if (params?.organization_id) query.append('organization_id', params.organization_id);
+        if (params?.skip !== undefined) query.append('skip', String(params.skip));
+        if (params?.limit !== undefined) query.append('limit', String(params.limit));
+        const qs = query.toString();
+        return apiClient.get<ApiAssistantMessage[]>(qs ? `/assistant/conversations/${conversationId}/messages?${qs}` : `/assistant/conversations/${conversationId}/messages`);
+      },
+      get: (messageId: string, params?: { organization_id?: string }) => {
+        const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
+        return apiClient.get<ApiAssistantMessage>(`/assistant/messages/${messageId}${qs}`);
+      },
+      create: (conversationId: string, data: {
+        role: 'user' | 'assistant' | 'system';
+        content: string;
+        tokens_used?: number;
+        latency_ms?: number;
+      }, params?: { organization_id?: string }) => {
+        const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
+        return apiClient.post<ApiAssistantMessage>(`/assistant/conversations/${conversationId}/messages${qs}`, data);
+      },
+    },
+  },
+
+  // Assistant top-level convenience methods
+  createConversation: (data: { organization_id: string; user_id?: string; title?: string }) =>
+    apiClient.assistant.conversations.create(data),
+  getConversations: (params?: { organization_id?: string; skip?: number; limit?: number }) =>
+    apiClient.assistant.conversations.list(params),
+  getConversation: (id: string, params?: { organization_id?: string }) =>
+    apiClient.assistant.conversations.get(id, params),
+  updateConversation: (id: string, data: { title?: string }, params?: { organization_id?: string }) =>
+    apiClient.assistant.conversations.update(id, data, params),
+  deleteConversation: (id: string, params?: { organization_id?: string }) =>
+    apiClient.assistant.conversations.delete(id, params),
+  createMessage: (conversationId: string, data: {
+    role: 'user' | 'assistant' | 'system';
+    content: string;
+    tokens_used?: number;
+    latency_ms?: number;
+  }, params?: { organization_id?: string }) =>
+    apiClient.assistant.messages.create(conversationId, data, params),
+  getConversationMessages: (conversationId: string, params?: { organization_id?: string; skip?: number; limit?: number }) =>
+    apiClient.assistant.messages.list(conversationId, params),
+  getMessage: (messageId: string, params?: { organization_id?: string }) =>
+    apiClient.assistant.messages.get(messageId, params),
 };

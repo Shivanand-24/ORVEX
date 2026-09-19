@@ -5,6 +5,8 @@ from app.services.user_service import user_service
 from app.services.membership_service import membership_service
 from app.services.knowledge_source_service import knowledge_source_service
 from app.services.knowledge_document_service import knowledge_document_service
+from app.services.assistant_conversation_service import assistant_conversation_service
+from app.services.assistant_message_service import assistant_message_service
 
 __all__ = [
     "organization_service",
@@ -12,4 +14,6 @@ __all__ = [
     "membership_service",
     "knowledge_source_service",
     "knowledge_document_service",
+    "assistant_conversation_service",
+    "assistant_message_service",
 ]

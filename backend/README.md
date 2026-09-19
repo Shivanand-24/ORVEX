@@ -54,14 +54,18 @@ backend/
 │   │   ├── user_repository.py
 │   │   ├── membership_repository.py
 │   │   ├── knowledge_source_repository.py
-│   │   └── knowledge_document_repository.py
+│   │   ├── knowledge_document_repository.py
+│   │   ├── conversation_repository.py
+│   │   └── message_repository.py
 │   │
 │   ├── services/          # Business logic layer
 │   │   ├── organization_service.py
 │   │   ├── user_service.py
 │   │   ├── membership_service.py
 │   │   ├── knowledge_source_service.py
-│   │   └── knowledge_document_service.py
+│   │   ├── knowledge_document_service.py
+│   │   ├── assistant_conversation_service.py
+│   │   └── assistant_message_service.py
 │   │
 │   ├── api/v1/            # API endpoints & routers
 │   │   ├── router.py      # Master v1 router
@@ -69,14 +73,16 @@ backend/
 │   │   ├── organizations.py # Organization CRUD router
 │   │   ├── users.py         # User CRUD router
 │   │   ├── memberships.py   # Organization Membership router
-│   │   └── knowledge.py     # Knowledge Sources & Documents router
+│   │   ├── knowledge.py     # Knowledge Sources & Documents router
+│   │   └── assistant.py     # Assistant Conversations & Messages router
 │   │
 │   └── schemas/           # Pydantic request/response schemas
 │       ├── health.py
 │       ├── organization.py
 │       ├── user.py
 │       ├── membership.py
-│       └── knowledge.py
+│       ├── knowledge.py
+│       └── assistant.py
 │
 ├── tests/                 # Pytest suite
 │   ├── test_health.py
@@ -86,7 +92,8 @@ backend/
 │   ├── test_users_api.py
 │   ├── test_memberships_api.py
 │   ├── test_knowledge_sources_api.py
-│   └── test_knowledge_documents_api.py
+│   ├── test_knowledge_documents_api.py
+│   └── test_assistant_api.py
 │
 ├── alembic.ini            # Alembic configuration
 ├── .env.example           # Environment template configuration
@@ -249,6 +256,46 @@ alembic upgrade head
 - **Tenant Isolation:** Cross-organization source queries, document lookups, and cross-tenant document attachments are strictly rejected with 404/400 errors.
 - **Current Limitation:** Because authentication is deferred to later milestones, `organization_id` is supplied explicitly at the API boundary.
 
+### Assistant API (`/api/v1/assistant/...`) (Phase 2D)
+
+#### Conversations (`/api/v1/assistant/conversations`)
+- `POST /api/v1/assistant/conversations`: Create a new conversation session for an organization.
+- `GET /api/v1/assistant/conversations`: List conversations, optionally filtered by `organization_id`.
+- `GET /api/v1/assistant/conversations/{conversation_id}`: Retrieve conversation by UUID (with optional `organization_id` tenant check).
+- `PATCH /api/v1/assistant/conversations/{conversation_id}`: Update conversation `title`.
+- `DELETE /api/v1/assistant/conversations/{conversation_id}`: Delete conversation (cascades deletion to all attached messages).
+
+**Example Create Request:**
+```json
+{
+  "organization_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "user_id": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+  "title": "Onboarding Architecture Discussion"
+}
+```
+
+#### Messages (`/api/v1/assistant/...`)
+- `POST /api/v1/assistant/conversations/{conversation_id}/messages`: Persist a user, assistant, or system message inside a conversation.
+- `GET /api/v1/assistant/conversations/{conversation_id}/messages`: List all messages in a conversation ordered chronologically.
+- `GET /api/v1/assistant/messages/{message_id}`: Retrieve a single message by UUID.
+
+**Example Create Message Request:**
+```json
+{
+  "role": "user",
+  "content": "What can ORVEX help me automate?",
+  "tokens_used": 0,
+  "latency_ms": 0
+}
+```
+
+#### Assistant Persistence & Tenant Isolation
+- **Organization Ownership:** Every conversation is owned by an organization and user.
+- **Message Inheritance:** Messages inherit tenant scope directly from their parent conversation.
+- **Role Validation:** Enforces database role check constraint (`user`, `assistant`, `system`).
+- **Tenant Isolation:** Cross-organization conversation queries, message listings, message retrieval, and message postings return `404 Not Found`.
+- **Current Limitation (Persistence First):** Messages are persisted reliably in the database; real AI/LLM response generation, streaming, and RAG execution will be attached in subsequent milestones.
+
 ---
 
 ## Running Development Server & Tests
@@ -273,8 +320,8 @@ The test suite runs using in-memory SQLite (`aiosqlite`) and does not require a 
 pytest -v
 ```
 
-All 55 backend unit and API integration tests cover:
-- FastAPI router, service, and repository layers for Organizations, Users, Memberships, Knowledge Sources, and Knowledge Documents
+All 75 backend unit and API integration tests cover:
+- FastAPI router, service, and repository layers for Organizations, Users, Memberships, Knowledge, and Assistant
 - Domain validation (emails, slugs, valid roles, lifecycle state transitions)
 - Conflict detection (duplicate slugs, duplicate emails, duplicate org memberships)
 - Entity not found handling (404 response codes)
