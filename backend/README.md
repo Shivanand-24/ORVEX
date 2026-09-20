@@ -46,6 +46,10 @@ backend/
 │   │   ├── resolver.py    # Agent configuration & tenant resolver
 │   │   └── approval.py    # Human-in-the-loop approval manager
 │   │
+│   ├── workflows/         # Workflow orchestration & DAG validation primitives
+│   │   ├── dag.py         # DAG validation (cycle, reachability, root detection, limits)
+│   │   └── adapters.py    # Orchestration contracts (Agent, Knowledge, Action, Condition)
+│   │
 │   ├── models/            # SQLAlchemy 2.x declarative models (15 tables)
 │   │   ├── base.py        # Base & TimestampMixin
 │   │   ├── organization.py # Organization
@@ -67,7 +71,8 @@ backend/
 │   │   ├── conversation_repository.py
 │   │   ├── message_repository.py
 │   │   ├── agent_repository.py
-│   │   └── agent_execution_repository.py
+│   │   ├── agent_execution_repository.py
+│   │   └── workflow_repository.py
 │   │
 │   ├── services/          # Business logic layer
 │   │   ├── organization_service.py
@@ -78,7 +83,8 @@ backend/
 │   │   ├── assistant_conversation_service.py
 │   │   ├── assistant_message_service.py
 │   │   ├── agent_service.py
-│   │   └── agent_execution_service.py
+│   │   ├── agent_execution_service.py
+│   │   └── workflow_service.py
 │   │
 │   ├── api/v1/            # API endpoints & routers
 │   │   ├── router.py      # Master v1 router
@@ -89,7 +95,8 @@ backend/
 │   │   ├── knowledge.py     # Knowledge Sources & Documents router
 │   │   ├── assistant.py     # Assistant Conversations & Messages router
 │   │   ├── agents.py        # Agents & Relationships router
-│   │   └── executions.py    # Agent Execution Lifecycle & Governance router
+│   │   ├── executions.py    # Agent Execution Lifecycle & Governance router
+│   │   └── workflows.py     # Workflows & Orchestration router
 │   │
 │   └── schemas/           # Pydantic request/response schemas
 │       ├── health.py
@@ -99,7 +106,8 @@ backend/
 │       ├── knowledge.py
 │       ├── assistant.py
 │       ├── agent.py
-│       └── agent_execution.py
+│       ├── agent_execution.py
+│       └── workflow.py
 │
 ├── tests/                 # Pytest suite
 │   ├── test_health.py
@@ -112,7 +120,8 @@ backend/
 │   ├── test_knowledge_documents_api.py
 │   ├── test_assistant_api.py
 │   ├── test_agent_api.py
-│   └── test_agent_execution.py
+│   ├── test_agent_execution.py
+│   └── test_workflow_api.py
 │
 ├── alembic.ini            # Alembic configuration
 ├── .env.example           # Environment template configuration
@@ -360,6 +369,68 @@ alembic upgrade head
 - **Audit Logging:** Every state transition automatically emits privacy-safe metadata audit logs (`agent.execution.*`) without leaking raw user prompts or confidential model outputs.
 - **Cascade Deletion:** Deleting an Agent cleanly cascades and removes all associated execution runs.
 
+### Workflows API (`/api/v1/workflows/...`) (Phase 2G)
+
+#### Workflows CRUD & Steps Management (`/api/v1/workflows`)
+- `POST /api/v1/workflows`: Create workflow definition with optional initial steps. Validates DAG structure if steps are provided.
+- `GET /api/v1/workflows`: List workflows filtered by `organization_id`, `status` (`draft`, `active`, `paused`), and pagination (`skip`, `limit`).
+- `GET /api/v1/workflows/{workflow_id}`: Retrieve workflow details including all configured steps and recent execution summaries.
+- `PATCH /api/v1/workflows/{workflow_id}`: Update workflow metadata (`name`, `description`).
+- `PATCH /api/v1/workflows/{workflow_id}/status`: Toggle workflow status (`draft`, `active`, `paused`).
+- `PUT /api/v1/workflows/{workflow_id}/steps`: Synchronize full set of steps with complete DAG graph validation.
+- `DELETE /api/v1/workflows/{workflow_id}`: Delete workflow (cascades deletion to steps and execution runs).
+
+**Example Create Workflow Request:**
+```json
+{
+  "organization_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "name": "Customer Support Escalation",
+  "description": "Orchestrates issue ingestion, retrieval, agent triage, and approval.",
+  "status": "draft",
+  "steps": [
+    {
+      "step_id": "trigger_step",
+      "name": "Incoming Ticket",
+      "step_type": "trigger",
+      "config": {"trigger_event": "ticket.created"},
+      "next_step_ids": ["retrieval_step"],
+      "position": {"x": 100, "y": 100}
+    },
+    {
+      "step_id": "retrieval_step",
+      "name": "Knowledge Search",
+      "step_type": "knowledge_retrieval",
+      "config": {"query_template": "{{trigger.body}}"},
+      "next_step_ids": ["agent_step"],
+      "position": {"x": 300, "y": 100}
+    },
+    {
+      "step_id": "agent_step",
+      "name": "Triage Agent",
+      "step_type": "agent",
+      "config": {"agent_id": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"},
+      "next_step_ids": [],
+      "position": {"x": 500, "y": 100}
+    }
+  ]
+}
+```
+
+#### Workflow Execution & Governance (`/api/v1/workflows/...`)
+- `POST /api/v1/workflows/{workflow_id}/execute`: Trigger execution of an `active` workflow. Executes DAG steps sequentially or pauses for approval.
+- `GET /api/v1/workflows/executions/{execution_id}`: Retrieve execution state, step results, and audit log.
+- `POST /api/v1/workflows/executions/{execution_id}/approve`: Grant human approval for execution paused in `waiting_approval`. Resumes execution from approval cursor.
+- `POST /api/v1/workflows/executions/{execution_id}/cancel`: Cancel a pending, running, or waiting workflow execution.
+
+#### DAG Validation & Orchestration Architecture
+- **Deterministic Entry:** Exactly one `trigger` step root (`in_degree == 0`) required.
+- **Graph Integrity:** Cycle detection via 3-color DFS traversal, self-reference prevention, missing `next_step_ids` rejection, duplicate edge deduplication, and unreachable orphan step detection.
+- **Traversal Limits:** Bounded execution (`MAX_WORKFLOW_STEPS = 50`, `MAX_EXECUTION_STEPS = 100`) preventing unbounded loops.
+- **Agent Delegation:** When an `agent` step runs, orchestration delegates to the Phase 2F `AgentExecutionService`, generating a linked `AgentExecution` record (`source="workflow_step"`, `source_reference_id=workflow_execution.id`).
+- **Human-in-the-Loop:** `approval` steps transition execution to `waiting_approval` with a stored `resume_step_id`. Approving resets status to `running` (never persisting `"approved"`) and resumes traversal.
+- **Transactional Safety:** Uses database row-level locking (`with_for_update`) during approval and cancellation transitions.
+- **Audit Privacy:** State changes emit `workflow.execution.*` events capturing metadata and metrics while omitting raw prompts or step payloads.
+
 ---
 
 ## Running Development Server & Tests
@@ -384,9 +455,9 @@ The test suite runs using in-memory SQLite (`aiosqlite`) and does not require a 
 pytest -v
 ```
 
-All 121 backend unit and API integration tests cover:
-- FastAPI router, service, and repository layers for Organizations, Users, Memberships, Knowledge, Assistant, Agents, and Executions
-- Domain validation (emails, slugs, valid roles, agent domains, valid statuses, lifecycle state transitions)
+All 156 backend unit and API integration tests cover:
+- FastAPI router, service, and repository layers for Organizations, Users, Memberships, Knowledge, Assistant, Agents, Executions, and Workflows
+- Domain validation (emails, slugs, valid roles, agent domains, valid statuses, lifecycle state transitions, DAG cycle/orphan/edge validation)
 - Conflict detection (duplicate slugs, duplicate emails, duplicate org memberships)
 - Entity not found handling (404 response codes)
 - Strict cross-organization access control & tenant isolation

@@ -145,8 +145,78 @@ export interface ApiCancellationRequest {
   reason?: string | null;
 }
 
+export interface ApiWorkflowStep {
+  id: string;
+  workflow_id: string;
+  step_order: number;
+  type: string;
+  title: string;
+  description?: string | null;
+  config: Record<string, unknown>;
+  next_step_ids: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ApiWorkflowStepCreate {
+  id?: string;
+  step_order: number;
+  type: string;
+  title: string;
+  description?: string | null;
+  config?: Record<string, unknown>;
+  next_step_ids?: string[];
+}
+
+export interface ApiWorkflow {
+  id: string;
+  organization_id: string;
+  created_by_user_id: string;
+  name: string;
+  description: string;
+  status: 'Active' | 'Draft' | 'Paused' | string;
+  trigger: string;
+  trigger_type: string;
+  created_at: string;
+  updated_at: string;
+  steps: ApiWorkflowStep[];
+  executions: number;
+  success_rate: string;
+  last_run: string;
+}
+
+export interface ApiWorkflowCreate {
+  organization_id: string;
+  created_by_user_id?: string | null;
+  name: string;
+  description: string;
+  status?: string;
+  trigger_type?: string;
+  trigger?: string;
+  steps?: ApiWorkflowStepCreate[];
+}
+
+export interface ApiWorkflowUpdate {
+  name?: string;
+  description?: string;
+  status?: string;
+  trigger_type?: string;
+  trigger?: string;
+}
+
+export interface ApiWorkflowExecution {
+  id: string;
+  workflow_id: string;
+  triggered_by_user_id?: string | null;
+  status: 'running' | 'waiting_approval' | 'completed' | 'failed' | 'cancelled' | string;
+  started_at: string;
+  completed_at?: string | null;
+  execution_log: Array<Record<string, unknown>>;
+}
+
 
 export const apiClient = {
+
 
   baseUrl: API_BASE_URL,
 
@@ -202,6 +272,25 @@ export const apiClient = {
 
     return response.json();
   },
+
+  async put<T>(endpoint: string, body: unknown, options?: RequestInit): Promise<T> {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...options?.headers,
+      },
+      body: JSON.stringify(body),
+      ...options,
+    });
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status} ${response.statusText}`);
+    }
+
+    return response.json();
+  },
+
 
   async delete(endpoint: string, options?: RequestInit): Promise<void> {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -588,6 +677,69 @@ export const apiClient = {
     cancel: (executionId: string, data: ApiCancellationRequest, params?: { organization_id?: string }) => {
       const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
       return apiClient.post<ApiAgentExecution>(`/executions/${executionId}/cancel${qs}`, data);
+    },
+  },
+
+  // Workflows API
+  workflows: {
+    create: (data: ApiWorkflowCreate) =>
+      apiClient.post<ApiWorkflow>('/workflows', data),
+    list: (params: {
+      organization_id: string;
+      status?: string;
+      skip?: number;
+      limit?: number;
+    }) => {
+      const searchParams = new URLSearchParams();
+      searchParams.append('organization_id', params.organization_id);
+      if (params.status) searchParams.append('status', params.status);
+      if (params.skip !== undefined) searchParams.append('skip', String(params.skip));
+      if (params.limit !== undefined) searchParams.append('limit', String(params.limit));
+      return apiClient.get<ApiWorkflow[]>(`/workflows?${searchParams.toString()}`);
+    },
+    get: (id: string, params?: { organization_id?: string }) => {
+      const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
+      return apiClient.get<ApiWorkflow>(`/workflows/${id}${qs}`);
+    },
+    update: (id: string, data: ApiWorkflowUpdate, params?: { organization_id?: string }) => {
+      const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
+      return apiClient.patch<ApiWorkflow>(`/workflows/${id}${qs}`, data);
+    },
+    toggleStatus: (id: string, params?: { organization_id?: string }) => {
+      const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
+      return apiClient.post<ApiWorkflow>(`/workflows/${id}/toggle-status${qs}`, {});
+    },
+    delete: (id: string, params?: { organization_id?: string }) => {
+      const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
+      return apiClient.delete(`/workflows/${id}${qs}`);
+    },
+    replaceSteps: (id: string, steps: ApiWorkflowStepCreate[], params?: { organization_id?: string }) => {
+      const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
+      return apiClient.put<ApiWorkflow>(`/workflows/${id}/steps${qs}`, steps);
+    },
+    execute: (id: string, data?: { triggered_by_user_id?: string }, params?: { organization_id?: string }) => {
+      const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
+      return apiClient.post<ApiWorkflowExecution>(`/workflows/${id}/execute${qs}`, data || {});
+    },
+    listExecutions: (workflowId: string, params?: { organization_id?: string; skip?: number; limit?: number }) => {
+      const searchParams = new URLSearchParams();
+      if (params?.organization_id) searchParams.append('organization_id', params.organization_id);
+      if (params?.skip !== undefined) searchParams.append('skip', String(params.skip));
+      if (params?.limit !== undefined) searchParams.append('limit', String(params.limit));
+      const qs = searchParams.toString() ? `?${searchParams.toString()}` : '';
+      return apiClient.get<ApiWorkflowExecution[]>(`/workflows/${workflowId}/executions${qs}`);
+    },
+    getExecution: (executionId: string, params?: { organization_id?: string }) => {
+      const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
+      return apiClient.get<ApiWorkflowExecution>(`/workflows/executions/${executionId}${qs}`);
+    },
+    approveExecution: (executionId: string, data: { user_id: string }, params?: { organization_id?: string }) => {
+      const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
+      return apiClient.post<ApiWorkflowExecution>(`/workflows/executions/${executionId}/approve${qs}`, data);
+    },
+    cancelExecution: (executionId: string, data: { user_id?: string; reason?: string }, params?: { organization_id?: string }) => {
+      const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
+      return apiClient.post<ApiWorkflowExecution>(`/workflows/executions/${executionId}/cancel${qs}`, data);
     },
   },
 };

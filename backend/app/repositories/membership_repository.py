@@ -71,5 +71,8 @@ class MembershipRepository:
         await db.delete(membership)
         await db.flush()
 
+    get_by_org_and_user = find_by_organization_and_user
+    list_by_org = list_by_organization
+
 
 membership_repository = MembershipRepository()
