@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -93,3 +94,32 @@ class MessageResponse(BaseModel):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class ChatPromptRequest(BaseModel):
+    """Payload for submitting a user prompt to generate an Assistant AI completion."""
+
+    content: str = Field(..., min_length=1, description="User prompt text")
+    system_instruction: Optional[str] = Field(None, description="Optional system persona or instructions")
+    model: Optional[str] = Field(None, description="Target LLM model override")
+    temperature: Optional[float] = Field(None, ge=0.0, le=2.0, description="Sampling temperature")
+    max_tokens: Optional[int] = Field(None, ge=1, le=128000, description="Maximum tokens to generate")
+
+    @field_validator("content")
+    @classmethod
+    def validate_content_not_blank(cls, v: str) -> str:
+        trimmed = v.strip()
+        if not trimmed:
+            raise ValueError("Prompt content cannot be empty or whitespace.")
+        return trimmed
+
+
+class ChatResponse(BaseModel):
+    """Normalized response payload containing persisted user & assistant message turns."""
+
+    conversation_id: UUID
+    user_message: MessageResponse
+    assistant_message: MessageResponse
+    provider: str
+    model: str
+    finish_reason: Optional[str] = None

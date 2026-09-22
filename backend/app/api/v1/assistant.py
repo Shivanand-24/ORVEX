@@ -4,7 +4,10 @@ from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db_session
+from app.llm import LLMGateway, get_llm_gateway
 from app.schemas.assistant import (
+    ChatPromptRequest,
+    ChatResponse,
     ConversationCreate,
     ConversationResponse,
     ConversationUpdate,
@@ -126,6 +129,29 @@ async def create_message(
         db, conversation_id, payload, organization_id=organization_id
     )
     return MessageResponse.model_validate(message)
+
+
+@router.post(
+    "/conversations/{conversation_id}/chat",
+    response_model=ChatResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Generate Assistant Chat Reply",
+    description="Submit a user prompt, execute generation through the LLM Gateway, and persist the conversation turn.",
+)
+async def chat_conversation(
+    conversation_id: UUID,
+    payload: ChatPromptRequest,
+    organization_id: UUID | None = Query(None, description="Enforce tenant organization isolation"),
+    db: AsyncSession = Depends(get_db_session),
+    gateway: LLMGateway = Depends(get_llm_gateway),
+) -> ChatResponse:
+    return await assistant_message_service.generate_chat_turn(
+        db=db,
+        conversation_id=conversation_id,
+        schema=payload,
+        organization_id=organization_id,
+        gateway=gateway,
+    )
 
 
 @router.get(

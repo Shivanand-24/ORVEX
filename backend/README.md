@@ -455,8 +455,9 @@ The test suite runs using in-memory SQLite (`aiosqlite`) and does not require a 
 pytest -v
 ```
 
-All 156 backend unit and API integration tests cover:
-- FastAPI router, service, and repository layers for Organizations, Users, Memberships, Knowledge, Assistant, Agents, Executions, and Workflows
+All 183 backend unit and API integration tests cover:
+- FastAPI router, service, and repository layers for Organizations, Users, Memberships, Knowledge, Assistant, Agents, Executions, Workflows, and LLM Gateway
+- Real LLM integration & stateless LLM Gateway (request normalization, token usage tracking, latency logging, mock & OpenAI-compatible providers, safe error translation)
 - Domain validation (emails, slugs, valid roles, agent domains, valid statuses, lifecycle state transitions, DAG cycle/orphan/edge validation)
 - Conflict detection (duplicate slugs, duplicate emails, duplicate org memberships)
 - Entity not found handling (404 response codes)

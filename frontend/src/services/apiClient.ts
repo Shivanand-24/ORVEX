@@ -87,6 +87,23 @@ export interface ApiAssistantMessage {
   created_at: string;
 }
 
+export interface ApiChatPromptRequest {
+  content: string;
+  system_instruction?: string | null;
+  model?: string | null;
+  temperature?: number | null;
+  max_tokens?: number | null;
+}
+
+export interface ApiChatResponse {
+  conversation_id: string;
+  user_message: ApiAssistantMessage;
+  assistant_message: ApiAssistantMessage;
+  provider: string;
+  model: string;
+  finish_reason?: string | null;
+}
+
 export interface ApiAgent {
   id: string;
   organization_id: string;
@@ -503,6 +520,10 @@ export const apiClient = {
         const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
         return apiClient.post<ApiAssistantMessage>(`/assistant/conversations/${conversationId}/messages${qs}`, data);
       },
+      chat: (conversationId: string, data: ApiChatPromptRequest, params?: { organization_id?: string }) => {
+        const qs = params?.organization_id ? `?organization_id=${encodeURIComponent(params.organization_id)}` : '';
+        return apiClient.post<ApiChatResponse>(`/assistant/conversations/${conversationId}/chat${qs}`, data);
+      },
     },
   },
 
@@ -528,6 +549,8 @@ export const apiClient = {
     apiClient.assistant.messages.list(conversationId, params),
   getMessage: (messageId: string, params?: { organization_id?: string }) =>
     apiClient.assistant.messages.get(messageId, params),
+  chat: (conversationId: string, data: ApiChatPromptRequest, params?: { organization_id?: string }) =>
+    apiClient.assistant.messages.chat(conversationId, data, params),
 
   // Agents API
   agents: {

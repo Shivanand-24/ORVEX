@@ -17,6 +17,15 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "postgresql+asyncpg://orvex_user:orvex_dev_secret@localhost:5432/orvex_db"
     SYNC_DATABASE_URL: str = "postgresql+psycopg2://orvex_user:orvex_dev_secret@localhost:5432/orvex_db"
 
+    # LLM Gateway Configuration
+    LLM_PROVIDER: str = "mock"
+    LLM_MODEL: str = "gpt-4o-mini"
+    LLM_API_KEY: Union[str, None] = None
+    LLM_API_BASE_URL: Union[str, None] = None
+    LLM_TIMEOUT_SECONDS: float = 30.0
+    LLM_TEMPERATURE: float = 0.7
+    LLM_MAX_TOKENS: int = 2048
+
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
     def parse_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:
