@@ -5,6 +5,8 @@ export type AssistantMessage = {
   role: MessageRole;
   content: string;
   createdAt: string;
+  tokensUsed?: number;
+  latencyMs?: number;
 };
 
 export type Conversation = {

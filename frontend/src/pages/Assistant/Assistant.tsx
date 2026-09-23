@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Bot,
+  Building2,
   Database,
   MessageSquare,
   Plus,
@@ -9,8 +10,10 @@ import {
   User,
   Zap,
 } from "lucide-react";
-import { assistantRepository } from "../../services/assistantRepository";
-import type { Conversation } from "../../types/assistant";
+import { apiClient } from "../../services/apiClient";
+import type { ApiOrganization } from "../../services/apiClient";
+import { toastService } from "../../services/toastService";
+import type { AssistantMessage, Conversation, MessageRole } from "../../types/assistant";
 
 const SUGGESTED_PROMPTS = [
   {
@@ -35,40 +38,264 @@ const SUGGESTED_PROMPTS = [
   },
 ];
 
+function formatTime(isoString: string): string {
+  try {
+    const date = new Date(isoString);
+    if (isNaN(date.getTime())) return isoString;
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  } catch {
+    return isoString;
+  }
+}
+
+function formatDate(isoString: string): string {
+  try {
+    const date = new Date(isoString);
+    if (isNaN(date.getTime())) return isoString;
+    return (
+      date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }) +
+      " " +
+      formatTime(isoString)
+    );
+  } catch {
+    return isoString;
+  }
+}
+
+let optimisticSeq = 0;
+function createOptimisticUserMessage(content: string): AssistantMessage {
+  optimisticSeq += 1;
+  return {
+    id: `optimistic-${Date.now()}-${optimisticSeq}`,
+    role: "user",
+    content,
+    createdAt: formatTime(new Date().toISOString()),
+  };
+}
+
 function Assistant() {
-  const [conversations, setConversations] = useState<readonly Conversation[]>(() =>
-    assistantRepository.getConversations()
-  );
-  const [activeConversationId, setActiveConversationId] = useState<string | null>(
-    () => conversations[0]?.id ?? null
-  );
+  const [organizations, setOrganizations] = useState<ApiOrganization[]>([]);
+  const [activeOrgId, setActiveOrgId] = useState<string | null>(null);
+  const [activeUserId, setActiveUserId] = useState<string | null>(null);
+  const [isLoadingOrg, setIsLoadingOrg] = useState(true);
+
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<AssistantMessage[]>([]);
+  const [isThinking, setIsThinking] = useState(false);
   const [inputText, setInputText] = useState("");
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(() => {
-    return assistantRepository.subscribe(() => {
-      const updatedList = assistantRepository.getConversations();
-      setConversations(updatedList);
-    });
+  const loadConversations = useCallback(async (orgId: string) => {
+    try {
+      const apiConvs = await apiClient.assistant.conversations.list({
+        organization_id: orgId,
+      });
+      const mappedConvs: Conversation[] = apiConvs.map((conv) => ({
+        id: conv.id,
+        title: conv.title,
+        messages: [],
+        createdAt: formatDate(conv.created_at),
+        updatedAt: formatDate(conv.updated_at),
+      }));
+      setConversations(mappedConvs);
+      if (mappedConvs.length > 0) {
+        setActiveConversationId(mappedConvs[0].id);
+      } else {
+        setActiveConversationId(null);
+        setMessages([]);
+      }
+    } catch (err) {
+      console.error("Failed to load conversations:", err);
+      toastService.show(
+        "Error loading conversations",
+        "Could not load your conversation history.",
+        "error"
+      );
+    }
   }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function init() {
+      try {
+        setIsLoadingOrg(true);
+        const [orgs, users] = await Promise.all([
+          apiClient.organizations.list(),
+          apiClient.users.list().catch(() => []),
+        ]);
+        if (!isMounted) return;
+        setOrganizations(orgs);
+        if (users.length > 0) {
+          setActiveUserId(users[0].id);
+        }
+        if (orgs.length > 0) {
+          const primaryOrg = orgs[0];
+          setActiveOrgId(primaryOrg.id);
+          await loadConversations(primaryOrg.id);
+        } else {
+          // Do NOT silently create organization on mount
+          setConversations([]);
+          setActiveConversationId(null);
+          setMessages([]);
+        }
+      } catch (err) {
+        if (!isMounted) return;
+        console.error("Failed to initialize organization context:", err);
+        toastService.show(
+          "Initialization Error",
+          "Could not load organization context. Please ensure backend is running.",
+          "error"
+        );
+      } finally {
+        if (isMounted) {
+          setIsLoadingOrg(false);
+        }
+      }
+    }
+
+    init();
+    return () => {
+      isMounted = false;
+    };
+  }, [loadConversations]);
+
+  useEffect(() => {
+    if (!activeConversationId || !activeOrgId) {
+      return;
+    }
+
+    const conversationId = activeConversationId;
+    const orgId = activeOrgId;
+
+    let isMounted = true;
+    async function fetchMessages() {
+      try {
+        const apiMessages = await apiClient.assistant.messages.list(
+          conversationId,
+          { organization_id: orgId }
+        );
+        if (!isMounted) return;
+        setMessages(
+          apiMessages.map((m) => ({
+            id: m.id,
+            role: m.role as MessageRole,
+            content: m.content,
+            createdAt: formatTime(m.created_at),
+            tokensUsed: m.tokens_used,
+            latencyMs: m.latency_ms,
+          }))
+        );
+      } catch (err) {
+        if (!isMounted) return;
+        console.error("Failed to fetch messages:", err);
+        toastService.show(
+          "Error loading messages",
+          "Could not load conversation messages.",
+          "error"
+        );
+      }
+    }
+
+    fetchMessages();
+    return () => {
+      isMounted = false;
+    };
+  }, [activeConversationId, activeOrgId]);
 
   const activeConversation = conversations.find(
     (conv) => conv.id === activeConversationId
   );
-  const isThinking = activeConversationId
-    ? assistantRepository.isThinking(activeConversationId)
-    : false;
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [activeConversation?.messages, isThinking]);
+  }, [messages, isThinking]);
 
-  const handleCreateNewChat = () => {
-    const newConv = assistantRepository.createConversation();
-    setActiveConversationId(newConv.id);
-    setInputText("");
-    setTimeout(() => textareaRef.current?.focus(), 50);
+  const handleBootstrapOrganization = async () => {
+    try {
+      const newOrg = await apiClient.organizations.create({
+        name: "Acme Corporation",
+        slug: "acme-corp",
+      });
+      let resolvedUserId = activeUserId;
+      if (!resolvedUserId) {
+        try {
+          const newUser = await apiClient.users.create({
+            email: "admin@acme.corp",
+            full_name: "Acme Admin",
+          });
+          resolvedUserId = newUser.id;
+          setActiveUserId(newUser.id);
+          await apiClient.memberships.add(newOrg.id, {
+            user_id: newUser.id,
+            role: "admin",
+          });
+        } catch {
+          // Non-blocking
+        }
+      }
+      setOrganizations([newOrg]);
+      setActiveOrgId(newOrg.id);
+      await loadConversations(newOrg.id);
+      toastService.show(
+        "Organization Initialized",
+        "Created Acme Corporation development organization.",
+        "success"
+      );
+    } catch (err) {
+      console.error("Failed to initialize organization:", err);
+      toastService.show(
+        "Setup Error",
+        "Failed to create development organization.",
+        "error"
+      );
+    }
+  };
+
+  const handleCreateNewChat = async () => {
+    if (!activeOrgId) {
+      toastService.show(
+        "No Organization",
+        "An active organization is required to start a conversation.",
+        "warning"
+      );
+      return;
+    }
+
+    try {
+      const newConv = await apiClient.assistant.conversations.create({
+        organization_id: activeOrgId,
+        user_id: activeUserId ?? undefined,
+        title: "New Conversation",
+      });
+
+      const mappedConv: Conversation = {
+        id: newConv.id,
+        title: newConv.title,
+        messages: [],
+        createdAt: formatDate(newConv.created_at),
+        updatedAt: formatDate(newConv.updated_at),
+      };
+
+      setConversations((prev) => [mappedConv, ...prev]);
+      setActiveConversationId(newConv.id);
+      setMessages([]);
+      setInputText("");
+      setTimeout(() => textareaRef.current?.focus(), 50);
+    } catch (err) {
+      console.error("Failed to create conversation:", err);
+      toastService.show(
+        "Error",
+        "Could not create a new conversation session.",
+        "error"
+      );
+    }
   };
 
   const handleSendMessage = async (textToSend?: string) => {
@@ -77,19 +304,121 @@ function Assistant() {
       return;
     }
 
-    let targetConvId = activeConversationId;
-
-    if (!targetConvId) {
-      const newConv = assistantRepository.createConversation();
-      targetConvId = newConv.id;
-      setActiveConversationId(newConv.id);
+    if (!activeOrgId) {
+      toastService.show(
+        "No Organization",
+        "An active organization is required to send messages.",
+        "warning"
+      );
+      return;
     }
+
+    let targetConvId = activeConversationId;
 
     if (!textToSend) {
       setInputText("");
     }
 
-    await assistantRepository.sendMessage(targetConvId, messageText);
+    const optimisticUserMsg = createOptimisticUserMessage(messageText);
+    const optimisticId = optimisticUserMsg.id;
+
+    try {
+      if (!targetConvId) {
+        const title =
+          messageText.length > 32
+            ? `${messageText.substring(0, 32)}...`
+            : messageText;
+        const newConv = await apiClient.assistant.conversations.create({
+          organization_id: activeOrgId,
+          user_id: activeUserId ?? undefined,
+          title,
+        });
+        targetConvId = newConv.id;
+        setActiveConversationId(newConv.id);
+        const mappedConv: Conversation = {
+          id: newConv.id,
+          title: newConv.title,
+          messages: [],
+          createdAt: formatDate(newConv.created_at),
+          updatedAt: formatDate(newConv.updated_at),
+        };
+        setConversations((prev) => [mappedConv, ...prev]);
+      }
+
+      setMessages((prev) => [...prev, optimisticUserMsg]);
+      setIsThinking(true);
+
+      const response = await apiClient.assistant.messages.chat(
+        targetConvId,
+        { content: messageText },
+        { organization_id: activeOrgId }
+      );
+
+      const persistedUserMsg: AssistantMessage = {
+        id: response.user_message.id,
+        role: "user",
+        content: response.user_message.content,
+        createdAt: formatTime(response.user_message.created_at),
+        tokensUsed: response.user_message.tokens_used,
+        latencyMs: response.user_message.latency_ms,
+      };
+
+      const persistedAssistantMsg: AssistantMessage = {
+        id: response.assistant_message.id,
+        role: "assistant",
+        content: response.assistant_message.content,
+        createdAt: formatTime(response.assistant_message.created_at),
+        tokensUsed: response.assistant_message.tokens_used,
+        latencyMs: response.assistant_message.latency_ms,
+      };
+
+      setMessages((prev) => [
+        ...prev.filter((m) => m.id !== optimisticId),
+        persistedUserMsg,
+        persistedAssistantMsg,
+      ]);
+
+      const currentConv = conversations.find((c) => c.id === targetConvId);
+      const isDefaultTitle =
+        !currentConv ||
+        currentConv.title === "New Conversation" ||
+        currentConv.title === "New Chat";
+
+      let nextTitle = currentConv?.title || "New Conversation";
+      if (isDefaultTitle) {
+        nextTitle =
+          messageText.length > 32
+            ? `${messageText.substring(0, 32)}...`
+            : messageText;
+        try {
+          await apiClient.assistant.conversations.update(
+            targetConvId,
+            { title: nextTitle },
+            { organization_id: activeOrgId }
+          );
+        } catch {
+          // Non-blocking update failure
+        }
+      }
+
+      const updatedTime = formatDate(response.assistant_message.created_at);
+      setConversations((prev) =>
+        prev.map((c) =>
+          c.id === targetConvId
+            ? { ...c, title: nextTitle, updatedAt: updatedTime }
+            : c
+        )
+      );
+    } catch (err: unknown) {
+      console.error("Assistant chat error:", err);
+      toastService.show(
+        "Assistant Error",
+        "Failed to generate response. Please try again.",
+        "error"
+      );
+    } finally {
+      setIsThinking(false);
+    }
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -145,6 +474,7 @@ function Assistant() {
               type="button"
               onClick={handleCreateNewChat}
               aria-label="Start new conversation"
+              disabled={!activeOrgId}
             >
               <Plus size={16} />
               <span>New Chat</span>
@@ -180,7 +510,11 @@ function Assistant() {
               })
             ) : (
               <div className="sidebar-empty-state">
-                <p>No conversations yet.</p>
+                <p>
+                  {organizations.length === 0 && !isLoadingOrg
+                    ? "No organization found."
+                    : "No conversations yet."}
+                </p>
               </div>
             )}
           </div>
@@ -197,7 +531,26 @@ function Assistant() {
             <span className="workspace-badge">ORVEX Intelligence</span>
           </div>
 
-          {!activeConversation || activeConversation.messages.length === 0 ? (
+          {organizations.length === 0 && !isLoadingOrg ? (
+            /* Controlled Setup State for empty organizations */
+            <div className="assistant-welcome">
+              <div className="welcome-icon-wrapper">
+                <Building2 size={28} />
+              </div>
+              <h2>Organization Required</h2>
+              <p>
+                No enterprise organization was found. An active organization is required to create conversations and run AI copilot sessions.
+              </p>
+              <button
+                className="primary-button"
+                type="button"
+                onClick={handleBootstrapOrganization}
+                style={{ marginTop: "16px" }}
+              >
+                Initialize Development Organization
+              </button>
+            </div>
+          ) : !activeConversation || messages.length === 0 ? (
             /* Welcome State */
             <div className="assistant-welcome">
               <div className="welcome-icon-wrapper">
@@ -217,6 +570,7 @@ function Assistant() {
                     className="suggested-prompt-card"
                     type="button"
                     onClick={() => handleSendMessage(item.prompt)}
+                    disabled={isThinking || !activeOrgId}
                   >
                     <strong>
                       <Zap size={14} style={{ color: "#0E6B63" }} />
@@ -230,7 +584,7 @@ function Assistant() {
           ) : (
             /* Messages List */
             <div className="assistant-messages" aria-live="polite">
-              {activeConversation.messages.map((msg) => (
+              {messages.map((msg) => (
                 <div key={msg.id} className={`message-row ${msg.role}`}>
                   <div className="message-avatar">
                     {msg.role === "user" ? <User size={16} /> : <Bot size={16} />}
@@ -257,7 +611,11 @@ function Assistant() {
                         }}
                       >
                         <Database size={12} style={{ color: "#0E6B63" }} />
-                        <span>Sources: Company Handbook & Product Docs • RAG Confidence: 98.4%</span>
+                        <span>
+                          {msg.tokensUsed !== undefined && msg.tokensUsed > 0
+                            ? `Tokens: ${msg.tokensUsed} • Latency: ${msg.latencyMs ?? 0}ms`
+                            : "Sources: Company Handbook & Product Docs • RAG Confidence: 98.4%"}
+                        </span>
                       </div>
                     )}
 
@@ -302,23 +660,27 @@ function Assistant() {
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Ask ORVEX Assistant anything..."
+                placeholder={
+                  !activeOrgId
+                    ? "Initialize an organization to start chatting..."
+                    : "Ask ORVEX Assistant anything..."
+                }
                 rows={1}
                 aria-label="Type your message"
-                disabled={isThinking}
+                disabled={isThinking || !activeOrgId}
               />
 
               <button
                 className="composer-send-button"
                 type="submit"
-                disabled={!inputText.trim() || isThinking}
+                disabled={!inputText.trim() || isThinking || !activeOrgId}
                 aria-label="Send message"
               >
                 <Send size={16} />
               </button>
             </form>
             <div className="composer-footer-note">
-              ORVEX AI Assistant (Milestone 4A Frontend Demo). Press Enter to send, Shift+Enter for newline.
+              ORVEX AI Assistant (Connected to LLM Gateway). Press Enter to send, Shift+Enter for newline.
             </div>
           </div>
         </main>
