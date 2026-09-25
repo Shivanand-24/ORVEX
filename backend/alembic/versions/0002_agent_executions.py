@@ -47,6 +47,14 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["triggered_by_user_id"], ["users.id"], ondelete="SET NULL"),
         sa.ForeignKeyConstraint(["approved_by_user_id"], ["users.id"], ondelete="SET NULL"),
         sa.PrimaryKeyConstraint("id"),
+        sa.CheckConstraint(
+            "status IN ('pending', 'running', 'waiting_for_approval', 'completed', 'failed', 'cancelled')",
+            name="chk_agent_execution_status",
+        ),
+        sa.CheckConstraint(
+            "source IN ('direct_api', 'assistant_chat', 'workflow_step')",
+            name="chk_agent_execution_source",
+        ),
     )
     op.create_index("idx_agent_executions_org", "agent_executions", ["organization_id"])
     op.create_index("idx_agent_executions_agent_started", "agent_executions", ["agent_id", "started_at"])
