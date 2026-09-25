@@ -8,6 +8,7 @@ from app.llm.errors import (
 )
 from app.llm.gateway import LLMGateway, get_llm_gateway
 from app.llm.interfaces import BaseLLMProvider
+from app.llm.providers.claude import ClaudeProvider
 from app.llm.providers.mock import MockLLMProvider
 from app.llm.providers.openai import OpenAIProvider
 from app.llm.schemas import (
@@ -24,6 +25,7 @@ __all__ = [
     "BaseLLMProvider",
     "MockLLMProvider",
     "OpenAIProvider",
+    "ClaudeProvider",
     "LLMMessage",
     "LLMRequest",
     "LLMResponse",

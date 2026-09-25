@@ -4,6 +4,7 @@ from typing import Optional
 from app.core.config import Settings, settings as default_settings
 from app.llm.errors import ConfigurationError
 from app.llm.interfaces import BaseLLMProvider
+from app.llm.providers.claude import ClaudeProvider
 from app.llm.providers.mock import MockLLMProvider
 from app.llm.providers.openai import OpenAIProvider
 from app.llm.schemas import LLMRequest, LLMResponse, ProviderMetadata
@@ -32,10 +33,20 @@ class LLMGateway:
             )
 
         if provider_name in ("openai", "openai-compatible"):
+            api_key = settings.OPENAI_API_KEY or settings.LLM_API_KEY
             return OpenAIProvider(
-                api_key=settings.LLM_API_KEY,
+                api_key=api_key,
                 base_url=settings.LLM_API_BASE_URL,
                 default_model=settings.LLM_MODEL or "gpt-4o-mini",
+                timeout=settings.LLM_TIMEOUT_SECONDS,
+            )
+
+        if provider_name in ("claude", "anthropic"):
+            api_key = settings.ANTHROPIC_API_KEY or settings.LLM_API_KEY
+            return ClaudeProvider(
+                api_key=api_key,
+                base_url=settings.LLM_API_BASE_URL,
+                default_model=settings.LLM_MODEL,
                 timeout=settings.LLM_TIMEOUT_SECONDS,
             )
 

@@ -136,6 +136,32 @@ async def test_llm_gateway_resolution_openai():
     assert meta.default_model == "gpt-4o-mini"
 
 
+@pytest.mark.anyio
+async def test_llm_gateway_resolution_claude():
+    custom_settings = Settings(
+        LLM_PROVIDER="claude",
+        LLM_MODEL="claude-3-7-sonnet-20250219",
+        ANTHROPIC_API_KEY="sk-ant-test-key",
+    )
+    gateway = LLMGateway(settings=custom_settings)
+    meta = gateway.get_metadata()
+    assert meta.name == "claude"
+    assert meta.default_model == "claude-3-7-sonnet-20250219"
+
+
+@pytest.mark.anyio
+async def test_llm_gateway_resolution_claude_fallback_llm_api_key():
+    custom_settings = Settings(
+        LLM_PROVIDER="anthropic",
+        LLM_MODEL="claude-3-5-haiku-20241022",
+        LLM_API_KEY="sk-ant-generic-key",
+    )
+    gateway = LLMGateway(settings=custom_settings)
+    meta = gateway.get_metadata()
+    assert meta.name == "claude"
+    assert meta.default_model == "claude-3-5-haiku-20241022"
+
+
 def test_llm_gateway_unsupported_provider():
     custom_settings = Settings(LLM_PROVIDER="unsupported_vendor_xyz")
     with pytest.raises(ConfigurationError) as exc_info:

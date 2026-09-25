@@ -26,6 +26,10 @@ class Settings(BaseSettings):
     LLM_TEMPERATURE: float = 0.7
     LLM_MAX_TOKENS: int = 2048
 
+    # Provider-Specific Credentials
+    OPENAI_API_KEY: Union[str, None] = None
+    ANTHROPIC_API_KEY: Union[str, None] = None
+
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
     def parse_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:
