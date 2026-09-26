@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     # Provider-Specific Credentials
     OPENAI_API_KEY: Union[str, None] = None
     ANTHROPIC_API_KEY: Union[str, None] = None
+    GEMINI_API_KEY: Union[str, None] = None
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod

@@ -7,6 +7,7 @@ from sqlalchemy.pool import StaticPool
 from app.main import app
 from app.db.base import Base
 from app.db.session import get_db_session
+from app.llm import LLMGateway, MockLLMProvider, get_llm_gateway
 
 # In-memory SQLite for fast, isolated async testing
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
@@ -44,6 +45,10 @@ async def client_fixture(db_session: AsyncSession) -> AsyncGenerator[TestClient,
         yield db_session
 
     app.dependency_overrides[get_db_session] = override_get_db_session
+    from app.core.config import Settings
+    test_settings = Settings(LLM_PROVIDER="mock", LLM_MODEL="gpt-4o-mini")
+    mock_gateway = LLMGateway(provider=MockLLMProvider(default_model="gpt-4o-mini"), settings=test_settings)
+    app.dependency_overrides[get_llm_gateway] = lambda: mock_gateway
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides.clear()

@@ -29,12 +29,14 @@ class OpenAIProvider(BaseLLMProvider):
         default_model: str = DEFAULT_OPENAI_MODEL,
         timeout: float = 30.0,
         client: Optional[httpx.AsyncClient] = None,
+        provider_name: str = "openai",
     ) -> None:
         self.api_key = api_key
         self.base_url = (base_url or DEFAULT_OPENAI_BASE_URL).rstrip("/")
         self.default_model = default_model
         self.timeout = timeout
         self._client = client
+        self.provider_name = provider_name
 
     def _is_local_endpoint(self) -> bool:
         url = self.base_url.lower()
@@ -47,9 +49,10 @@ class OpenAIProvider(BaseLLMProvider):
             if self._is_local_endpoint():
                 effective_key = "local-no-key"
             else:
+                key_hint = f"{self.provider_name.upper()}_API_KEY" if self.provider_name in ("gemini", "openai") else "LLM_API_KEY"
                 raise ConfigurationError(
                     detail="AI service configuration is invalid or missing credentials.",
-                    internal_error="LLM_API_KEY is not configured for remote OpenAI provider.",
+                    internal_error=f"{key_hint} is not configured for remote {self.provider_name} provider.",
                 )
 
         headers = {
@@ -162,7 +165,7 @@ class OpenAIProvider(BaseLLMProvider):
             return LLMResponse(
                 content=content,
                 model=data.get("model", target_model),
-                provider="openai",
+                provider=self.provider_name,
                 usage=LLMUsage(
                     input_tokens=prompt_tokens,
                     output_tokens=completion_tokens,
@@ -180,13 +183,24 @@ class OpenAIProvider(BaseLLMProvider):
             ) from exc
 
     def get_metadata(self) -> ProviderMetadata:
-        return ProviderMetadata(
-            name="openai",
-            default_model=self.default_model,
-            supported_models=[
+        if self.provider_name == "gemini":
+            supported = [
+                "gemini-3-flash-preview",
+                "gemini-3.1-flash-lite-preview",
+                "gemini-3.8-flash",
+            ]
+        elif self.provider_name == "openai":
+            supported = [
                 "gpt-4o",
                 "gpt-4o-mini",
                 "gpt-4-turbo",
                 "gpt-3.5-turbo",
-            ],
+            ]
+        else:
+            supported = [self.default_model]
+
+        return ProviderMetadata(
+            name=self.provider_name,
+            default_model=self.default_model,
+            supported_models=supported,
         )

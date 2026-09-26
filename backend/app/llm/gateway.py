@@ -12,6 +12,10 @@ from app.llm.schemas import LLMRequest, LLMResponse, ProviderMetadata
 logger = logging.getLogger(__name__)
 
 
+DEFAULT_GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/"
+DEFAULT_GEMINI_MODEL = "gemini-3-flash-preview"
+
+
 class LLMGateway:
     """Stateless LLM Gateway for provider dispatch, request normalization, and error translation."""
 
@@ -39,6 +43,7 @@ class LLMGateway:
                 base_url=settings.LLM_API_BASE_URL,
                 default_model=settings.LLM_MODEL or "gpt-4o-mini",
                 timeout=settings.LLM_TIMEOUT_SECONDS,
+                provider_name="openai" if provider_name == "openai" else "openai-compatible",
             )
 
         if provider_name in ("claude", "anthropic"):
@@ -48,6 +53,20 @@ class LLMGateway:
                 base_url=settings.LLM_API_BASE_URL,
                 default_model=settings.LLM_MODEL,
                 timeout=settings.LLM_TIMEOUT_SECONDS,
+            )
+
+        if provider_name in ("gemini", "google"):
+            api_key = settings.GEMINI_API_KEY or settings.LLM_API_KEY
+            base_url = settings.LLM_API_BASE_URL or DEFAULT_GEMINI_BASE_URL
+            model = settings.LLM_MODEL
+            if not model or model == "gpt-4o-mini":
+                model = DEFAULT_GEMINI_MODEL
+            return OpenAIProvider(
+                api_key=api_key,
+                base_url=base_url,
+                default_model=model,
+                timeout=settings.LLM_TIMEOUT_SECONDS,
+                provider_name="gemini",
             )
 
         raise ConfigurationError(

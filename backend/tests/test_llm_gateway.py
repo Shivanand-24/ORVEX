@@ -162,6 +162,32 @@ async def test_llm_gateway_resolution_claude_fallback_llm_api_key():
     assert meta.default_model == "claude-3-5-haiku-20241022"
 
 
+@pytest.mark.anyio
+async def test_llm_gateway_resolution_gemini():
+    custom_settings = Settings(
+        LLM_PROVIDER="gemini",
+        LLM_MODEL="gemini-3-flash-preview",
+        GEMINI_API_KEY="sk-gemini-test-key",
+    )
+    gateway = LLMGateway(settings=custom_settings)
+    meta = gateway.get_metadata()
+    assert meta.name == "gemini"
+    assert meta.default_model == "gemini-3-flash-preview"
+
+
+@pytest.mark.anyio
+async def test_llm_gateway_resolution_gemini_fallback_llm_api_key():
+    custom_settings = Settings(
+        LLM_PROVIDER="google",
+        LLM_MODEL="gemini-2.0-flash",
+        LLM_API_KEY="sk-generic-gemini-key",
+    )
+    gateway = LLMGateway(settings=custom_settings)
+    meta = gateway.get_metadata()
+    assert meta.name == "gemini"
+    assert meta.default_model == "gemini-2.0-flash"
+
+
 def test_llm_gateway_unsupported_provider():
     custom_settings = Settings(LLM_PROVIDER="unsupported_vendor_xyz")
     with pytest.raises(ConfigurationError) as exc_info:
