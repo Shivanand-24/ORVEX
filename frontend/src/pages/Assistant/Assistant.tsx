@@ -7,7 +7,9 @@ import {
   Plus,
   Send,
   Sparkles,
+  Trash2,
   User,
+  X,
   Zap,
 } from "lucide-react";
 import { apiClient } from "../../services/apiClient";
@@ -88,6 +90,8 @@ function Assistant() {
   const [messages, setMessages] = useState<AssistantMessage[]>([]);
   const [isThinking, setIsThinking] = useState(false);
   const [inputText, setInputText] = useState("");
+  const [conversationToDelete, setConversationToDelete] = useState<Conversation | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -217,6 +221,19 @@ function Assistant() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isThinking]);
 
+  useEffect(() => {
+    if (!conversationToDelete) return;
+
+    const handleDialogKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !isDeleting) {
+        setConversationToDelete(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleDialogKeyDown);
+    return () => window.removeEventListener("keydown", handleDialogKeyDown);
+  }, [conversationToDelete, isDeleting]);
+
   const handleBootstrapOrganization = async () => {
     try {
       const newOrg = await apiClient.organizations.create({
@@ -295,6 +312,46 @@ function Assistant() {
         "Could not create a new conversation session.",
         "error"
       );
+    }
+  };
+
+  const handleDeleteConversation = async () => {
+    if (!conversationToDelete || !activeOrgId || isDeleting) {
+      return;
+    }
+
+    const targetId = conversationToDelete.id;
+    setIsDeleting(true);
+
+    try {
+      await apiClient.assistant.conversations.delete(targetId, {
+        organization_id: activeOrgId,
+      });
+
+      // 1. Immediately remove from sidebar
+      const remaining = conversations.filter((c) => c.id !== targetId);
+      setConversations(remaining);
+
+      // 2. Handle active conversation selection update
+      if (activeConversationId === targetId) {
+        if (remaining.length > 0) {
+          setActiveConversationId(remaining[0].id);
+        } else {
+          setActiveConversationId(null);
+          setMessages([]);
+        }
+      }
+
+      setConversationToDelete(null);
+    } catch (err) {
+      console.error("Failed to delete conversation:", err);
+      toastService.show(
+        "Delete Error",
+        "Failed to delete conversation. Please try again.",
+        "error"
+      );
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -491,6 +548,7 @@ function Assistant() {
                     className={`conversation-item ${isActive ? "active" : ""}`}
                     onClick={() => setActiveConversationId(conv.id)}
                     onKeyDown={(e) => {
+                      if (e.target !== e.currentTarget) return;
                       if (e.key === "Enter" || e.key === " ") {
                         e.preventDefault();
                         setActiveConversationId(conv.id);
@@ -505,6 +563,19 @@ function Assistant() {
                       <span className="conversation-item-title">{conv.title}</span>
                       <span className="conversation-item-date">{conv.updatedAt}</span>
                     </div>
+                    <button
+                      type="button"
+                      className="conversation-item-delete-btn"
+                      title="Delete conversation"
+                      aria-label={`Delete conversation: ${conv.title}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setConversationToDelete(conv);
+                      }}
+                      disabled={isDeleting}
+                    >
+                      <Trash2 size={14} />
+                    </button>
                   </div>
                 );
               })
@@ -685,6 +756,66 @@ function Assistant() {
           </div>
         </main>
       </div>
+
+      {/* Confirmation Modal for Conversation Deletion */}
+      {conversationToDelete && (
+        <div
+          className="modal-backdrop"
+          role="presentation"
+          onClick={() => {
+            if (!isDeleting) setConversationToDelete(null);
+          }}
+        >
+          <div
+            className="modal-container"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-dialog-title"
+            aria-describedby="delete-dialog-desc"
+            style={{ maxWidth: "440px" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header">
+              <div>
+                <h2 id="delete-dialog-title">Delete conversation?</h2>
+                <p id="delete-dialog-desc" style={{ marginTop: "4px" }}>
+                  This conversation and its messages will be permanently deleted.
+                </p>
+              </div>
+              <button
+                type="button"
+                className="modal-close-button"
+                onClick={() => {
+                  if (!isDeleting) setConversationToDelete(null);
+                }}
+                disabled={isDeleting}
+                aria-label="Close dialog"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={() => setConversationToDelete(null)}
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="danger-button"
+                onClick={handleDeleteConversation}
+                disabled={isDeleting}
+              >
+                {isDeleting ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

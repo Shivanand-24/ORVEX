@@ -127,6 +127,38 @@
   color: var(--orvex-text-muted);
 }
 
+.conversation-item-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  background: transparent;
+  color: var(--orvex-text-muted);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.conversation-item:hover .conversation-item-delete-btn,
+.conversation-item:focus-within .conversation-item-delete-btn,
+.conversation-item.active .conversation-item-delete-btn {
+  opacity: 1;
+}
+
+.conversation-item-delete-btn:hover:not(:disabled) {
+  background: rgba(182, 69, 69, 0.12);
+  color: #b64545;
+}
+
+.conversation-item-delete-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 /* WORKSPACE */
 .assistant-workspace {
   flex: 1;

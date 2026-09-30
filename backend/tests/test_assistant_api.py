@@ -173,6 +173,43 @@ async def test_delete_conversation(client: TestClient, setup_org_and_user):
 
 
 @pytest.mark.anyio
+async def test_delete_conversation_nonexistent_returns_404(client: TestClient, setup_org_and_user):
+    random_id = str(uuid.uuid4())
+    org_id = setup_org_and_user["org_id"]
+
+    # Without org param
+    res1 = client.delete(f"/api/v1/assistant/conversations/{random_id}")
+    assert res1.status_code == 404
+    assert "not found" in res1.json()["detail"].lower()
+
+    # With org param
+    res2 = client.delete(f"/api/v1/assistant/conversations/{random_id}?organization_id={org_id}")
+    assert res2.status_code == 404
+    assert "not found" in res2.json()["detail"].lower()
+
+
+@pytest.mark.anyio
+async def test_repeated_deletion_returns_404(client: TestClient, setup_org_and_user):
+    org_id = setup_org_and_user["org_id"]
+    user_id = setup_org_and_user["user_id"]
+
+    conv = client.post(
+        "/api/v1/assistant/conversations",
+        json={"organization_id": org_id, "user_id": user_id, "title": "Double Delete"},
+    ).json()
+    conv_id = conv["id"]
+
+    # First delete -> 204
+    del1 = client.delete(f"/api/v1/assistant/conversations/{conv_id}?organization_id={org_id}")
+    assert del1.status_code == 204
+
+    # Repeated delete -> 404
+    del2 = client.delete(f"/api/v1/assistant/conversations/{conv_id}?organization_id={org_id}")
+    assert del2.status_code == 404
+    assert "not found" in del2.json()["detail"].lower()
+
+
+@pytest.mark.anyio
 async def test_cross_organization_conversation_isolation(client: TestClient, setup_org_and_user):
     org_a_id = setup_org_and_user["org_id"]
     user_a_id = setup_org_and_user["user_id"]
