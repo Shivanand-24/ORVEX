@@ -31,6 +31,11 @@ class Settings(BaseSettings):
     ANTHROPIC_API_KEY: Union[str, None] = None
     GEMINI_API_KEY: Union[str, None] = None
 
+    # Embedding Gateway Configuration
+    EMBEDDING_PROVIDER: str = "mock"
+    EMBEDDING_MODEL: str = "mock-embedding"
+    EMBEDDING_DIMENSIONS: int = 384
+
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
     def parse_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:
